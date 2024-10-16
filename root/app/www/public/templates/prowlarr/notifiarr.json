@@ -1,0 +1,8 @@
+{
+    "/api/v1/system/status": [
+        "get"
+    ],
+    "/api/v1/system/backup": [
+        "get"
+    ]
+}
