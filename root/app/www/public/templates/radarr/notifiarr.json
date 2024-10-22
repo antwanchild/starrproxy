@@ -27,6 +27,9 @@
         "delete",
         "get"
     ],
+    "/api/v3/history": [
+        "get"
+    ],
     "/api/v3/importlist": [
         "get",
         "post"

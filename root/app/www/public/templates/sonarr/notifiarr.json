@@ -81,9 +81,6 @@
     "/api/v3/queue": [
         "get"
     ],
-    "/api/v3/releaseprofile": [
-        "get"
-    ],
     "/api/v3/rootfolder": [
         "get"
     ],
@@ -117,6 +114,9 @@
     ],
     "/api/v3/tag/{id}": [
         "put",
+        "get"
+    ],
+    "/api/v3/releaseprofile": [
         "get"
     ],
     "/api/v3/history": [
