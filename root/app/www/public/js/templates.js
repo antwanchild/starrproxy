@@ -47,3 +47,17 @@ function applyTemplateOptions()
     });
 }
 // ---------------------------------------------------------------------------------------------
+function deleteCustomTemplate(app, starr)
+{
+    if (confirm('Are you sure you want to delete this template?')) {
+        $.ajax({
+            type: 'POST',
+            url: 'ajax.php',
+            data: '&m=deleteCustomTemplate&app=' + app + '&starr=' + starr,
+            success: function () {
+                reload();
+            }
+        });
+    }
+}
+// ---------------------------------------------------------------------------------------------

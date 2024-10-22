@@ -1,20 +1,26 @@
 {
-    "/api/system/status": [
+    "/api/v3/episode": [
         "get"
     ],
-    "/api/v3/system/status": [
+    "/api/v3/episode/{id}": [
+        "get"
+    ],
+    "/api/v3/episodefile/{id}": [
         "get"
     ],
     "/api/v3/rootfolder": [
         "get"
     ],
+    "/api/v3/series/{id}": [
+        "get"
+    ],
+    "/api/v3/system/status": [
+        "get"
+    ],
     "/api/v3/tag": [
         "get"
     ],
-    "/api/v3/series/": [
-        "get"
-    ],
-    "/api/v3/episode": [
+    "/api/system/status": [
         "get"
     ]
 }

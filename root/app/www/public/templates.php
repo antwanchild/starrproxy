@@ -22,9 +22,9 @@ $templateList = getTemplateList();
             $custom = str_contains($appTemplate['location'], APP_USER_TEMPLATES_PATH);
             ?>
             <ul style="margin-bottom: 0px; padding-bottom: 0px;">
-                <li class="app-index-<?= $index ?>" style="cursor: pointer;" onclick="viewTemplate('<?= $appTemplate['location'] . $appTemplate['starr'] ?>/<?= $app ?>.json', <?= $index ?>)">
-                    <?= $appTemplate['starr'] ?>
-                    <?= $custom ? ' <i class="far fa-user text-warning" title="Custom user template"></i>' : '' ?>
+                <li class="app-index-<?= $index ?>">
+                    <span style="cursor: pointer;" onclick="viewTemplate('<?= $appTemplate['location'] . $appTemplate['starr'] ?>/<?= $app ?>.json', <?= $index ?>)"><?= $appTemplate['starr'] ?></span>
+                    <?= $custom ? ' <i class="far fa-user text-warning" title="Custom user template"></i> <i class="far fa-trash-alt text-danger" title="Delete custom template" style="cursor:pointer;" onclick="deleteCustomTemplate(\'' . $app . '\', \'' . $appTemplate['starr'] . '\')"></i>' : '' ?>
                 </li>
             </ul>
             <?php

@@ -315,3 +315,7 @@ if ($_POST['m'] == 'addEndpointAccess') {
     print_r($settingsFile['access'][$app][$_POST['id']]);
     setFile(APP_SETTINGS_FILE, $settingsFile);
 }
+
+if ($_POST['m'] == 'deleteCustomTemplate') {
+    unlink(APP_USER_TEMPLATES_PATH . $_POST['starr'] . '/' . $_POST['app'] . '.json');
+}
