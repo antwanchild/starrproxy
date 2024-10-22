@@ -22,5 +22,11 @@
     ],
     "/api/system/status": [
         "get"
+    ],
+    "/api/v3/command": [
+        "post"
+    ],
+    "/api/v3/episodefile": [
+        "get"
     ]
 }

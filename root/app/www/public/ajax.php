@@ -194,7 +194,7 @@ if ($_POST['m'] == 'deleteAppStarrAccess') {
 }
 
 if ($_POST['m'] == 'openAppAccessLog') {
-    getLog($_POST['accessApp'], $_POST['key']);
+    getLog($_POST['accessApp'], $app);
 }
 
 if ($_POST['m'] == 'openTemplateStarrAccess') {

@@ -67,7 +67,7 @@ function getLogs()
     return $list;
 }
 
-function getLog($log, $key = false)
+function getLog($log, $app = false)
 {
     $logfile    = file_exists(APP_LOG_PATH . 'access_' . $log . '.log') ? APP_LOG_PATH . 'access_' . $log . '.log' : APP_LOG_PATH . $log;
     $file       = file_get_contents($logfile);
@@ -78,7 +78,7 @@ function getLog($log, $key = false)
         <li class="nav-item" role="presentation">
             <a class="nav-link active" data-bs-toggle="tab" href="#access" aria-selected="true" role="tab">Access log</a>
         </li>
-        <?php if ($key) { ?>
+        <?php if ($app) { ?>
         <li class="nav-item" role="presentation">
             <a class="nav-link" data-bs-toggle="tab" href="#endpoints" aria-selected="false" tabindex="-1" role="tab">Endpoint usage</a>
         </li>
@@ -114,8 +114,8 @@ function getLog($log, $key = false)
                 ?></table>
         </div>
         <?php 
-        if ($key) {
-            $proxiedApp = getAppFromProxiedKey($key, true);
+        if ($app) {
+            $proxiedApp = getAppFromProxiedKey($_POST['key'], true);
             ?>
             <div class="tab-pane fade" id="endpoints" role="tabpanel">
                 <h4>Endpoint usage <span class="text-small">(<?= count($endpointUsage) ?> endpoint<?= count($endpointUsage) == 1 ? '' : 's' ?>)</span></h4>
