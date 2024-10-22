@@ -37,8 +37,16 @@
         <script src="libraries/bootstrap/bootstrap.bundle.min.js"></script>
 
         <!-- Internal functions -->
-        <script src="js/functions.js?t=<?= filemtime('js/functions.js') ?>"></script>
-        <script src="js/starr.js?t=<?= filemtime('js/starr.js') ?>"></script>
-        <script src="js/templates.js?t=<?= filemtime('js/templates.js') ?>"></script>
+        <?php
+        $dir = opendir('js');
+        while ($file = readdir($dir)) {
+            if (!str_contains($file, '.js')) {
+                continue;
+            }
+
+            ?><script src="js/<?= $file ?>?t=<?= filemtime('js/' . $file) ?>"></script><?php
+        }
+        closedir($dir);
+        ?>
     </body>
 </html>

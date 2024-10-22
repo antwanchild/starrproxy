@@ -57,6 +57,9 @@
                             <a class="nav-link <?= $page == 'templates' ? 'active' : '' ?>" href="/?page=templates"><i class="far fa-file-alt"></i> <span class="me-3">Templates</span></a>
                         </li>
                         <li class="nav-item">
+                            <a class="nav-link <?= $page == 'logs' ? 'active' : '' ?>" href="/?page=logs"><i class="fas fa-clipboard-list"></i> <span class="me-3">Logs</span></a>
+                        </li>
+                        <li class="nav-item">
                             <a class="nav-link <?= $page == 'help' ? 'active' : '' ?>" href="/?page=help"><i class="far fa-question-circle"></i> <span class="me-3">Help</span></a>
                         </li>
                     </ul>

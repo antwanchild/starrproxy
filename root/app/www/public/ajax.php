@@ -194,75 +194,7 @@ if ($_POST['m'] == 'deleteAppStarrAccess') {
 }
 
 if ($_POST['m'] == 'openAppAccessLog') {
-    $logfile    = APP_LOG_PATH . 'access_' . $_POST['accessApp'] . '.log';
-    $file       = file_get_contents($logfile);
-    $lines      = explode("\n", $file);
-
-    ?>
-    <ul class="nav nav-tabs" role="tablist">
-        <li class="nav-item" role="presentation">
-            <a class="nav-link active" data-bs-toggle="tab" href="#access" aria-selected="true" role="tab">Access log</a>
-        </li>
-        <li class="nav-item" role="presentation">
-            <a class="nav-link" data-bs-toggle="tab" href="#endpoints" aria-selected="false" tabindex="-1" role="tab">Endpoint usage</a>
-        </li>
-    </ul>
-    <div id="myTabContent" class="tab-content">
-        <div class="tab-pane fade show active" id="access" role="tabpanel">
-            <table class="table table-bordered table-hover">
-                <?php
-                if ($lines) {
-                    $proxiedApp     = getAppFromProxiedKey($_POST['key'], true);
-                    $endpointUsage  = [];
-                    foreach ($lines as $line) {
-                        $error = '';
-                        if (str_contains_any($line, ['Code:3', 'Code:4', 'Code:5'])) {
-                            $error = '<span class="text-danger">[ERROR]</span> ';
-                        }
-
-                        if (!str_contains($line, 'key:' . $_POST['key'])) {
-                            continue;
-                        }
-
-                        preg_match('/endpoint:(.*);/U', $line, $endpointMatch);
-                        preg_match('/method:(.*);/U', $line, $methodMatch);
-                        if ($endpointMatch[1]) {
-                            $endpointUsage[$endpointMatch[1]][$methodMatch[1]]++;
-                        }
-
-                        ?><tr><td><?= $error . $line ?></td></tr><?php
-                    }
-                } else {
-                    ?><tr><td>No log data found.</td></tr><?php   
-                }
-                ?></table>
-        </div>
-        <div class="tab-pane fade" id="endpoints" role="tabpanel">
-            <h4>Endpoint usage <span class="text-small">(<?= count($endpointUsage) ?> endpoint<?= count($endpointUsage) == 1 ? '' : 's' ?>)</span></h4>
-            <?php
-            foreach ($endpointUsage as $endpoint => $methods) {
-                $endpoint = strtolower($endpoint);
-
-                foreach ($methods as $method => $usage) {
-                    $accessError = true;
-
-                    if ($proxiedApp['access'][$endpoint]) {
-                        if (in_array(strtolower($method), $proxiedApp['access'][$endpoint])) {
-                            $accessError = false;
-                        }
-                    }
-
-                    ?>
-                        <i id="disallowed-endpoint-<?= md5($endpoint.$method) ?>" class="far fa-times-circle text-danger" title="Disallowed endpoint, click to allow it" style="display: <?= $accessError ? 'inline-block' : 'none' ?>; cursor: pointer;" onclick="addEndpointAccess('<?= $app ?>', <?= $_POST['accessId'] ?>, '<?= $endpoint ?>', '<?= $method ?>', '<?= md5($endpoint.$method) ?>')"></i> 
-                        <i id="allowed-endpoint-<?= md5($endpoint.$method) ?>" class="far fa-check-circle text-success" title="Allowed endpoint" style="display: <?= !$accessError ? 'inline-block' : 'none' ?>;"></i>
-                        [<?= strtoupper($method) ?>] <?= $endpoint . ': ' . number_format($usage) ?> hit<?= $usage == 1 ? '' : 's' ?><br>
-                    <?php
-                }
-            }
-            ?>
-        </div>
-    </div>
-    <?php
+    getLog($_POST['accessApp'], $_POST['key']);
 }
 
 if ($_POST['m'] == 'openTemplateStarrAccess') {
@@ -318,4 +250,12 @@ if ($_POST['m'] == 'addEndpointAccess') {
 
 if ($_POST['m'] == 'deleteCustomTemplate') {
     unlink(APP_USER_TEMPLATES_PATH . $_POST['starr'] . '/' . $_POST['app'] . '.json');
+}
+
+if ($_POST['m'] == 'viewLog') {
+    getLog($_POST['log']);
+}
+
+if ($_POST['m'] == 'deleteLog') {
+    unlink(APP_LOG_PATH . $_POST['log']);
 }
