@@ -45,10 +45,10 @@ if ($_POST['m'] == 'saveStarr') {
 
     //-- NEW INSTANCE
     if ($_POST['instance'] == '99') {
-        $settingsFile[$app][] = ['name' => $name, 'url' => $_POST['url'], 'apikey' => $_POST['apikey']];
+        $settingsFile[$app][] = ['name' => $name, 'url' => $_POST['url'], 'apikey' => $_POST['apikey'], 'username' => rawurldecode($_POST['username']), 'password' => rawurldecode($_POST['password'])];
     } else {
         if ($_POST['instance'] >= 0) {
-            $settingsFile[$app][$_POST['instance']] = ['name' => $name, 'url' => $_POST['url'], 'apikey' => $_POST['apikey']];
+            $settingsFile[$app][$_POST['instance']] = ['name' => $name, 'url' => $_POST['url'], 'apikey' => $_POST['apikey'], 'username' => rawurldecode($_POST['username']), 'password' => rawurldecode($_POST['password'])];
         }
     }
 

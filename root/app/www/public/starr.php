@@ -17,6 +17,8 @@
                     <th>Name</th>
                     <th>URL</th>
                     <th>Apikey</th>
+                    <th><i class="far fa-question-circle" title="This is only needed for corruption checks with Notifiarr"></i> User</th>
+                    <th><i class="far fa-question-circle" title="This is only needed for corruption checks with Notifiarr"></i> Pass</th>
                     <th class="w-25">&nbsp;</th>
                 </tr>
             </thead>
@@ -34,10 +36,12 @@
                                     <button class="btn btn-primary" type="button" id="apikey-<?= $instance ?>" onclick="$('#instance-apikey-<?= $instance ?>').val($('#instance-apikey-<?= $instance ?>').data('apikey'))">Show</button>
                                 </div>
                             </td>
+                            <td><input type="text" class="form-control" id="instance-username-<?= $instance ?>" placeholder="username" value="<?= $instanceSettings['username'] ?>"></td>
+                            <td><input type="password" class="form-control" id="instance-password-<?= $instance ?>" placeholder="password" value="<?= $instanceSettings['password'] ?>"></td>
                             <td align="center">
-                                <button class="btn btn-outline-info" type="button" onclick="testStarr('<?= $app ?>', '<?= $instance ?>')"><i class="fas fa-network-wired"></i> Test</button>
-                                <button class="btn btn-outline-success" type="button" onclick="saveStarr('<?= $app ?>', '<?= $instance ?>')"><i class="fas fa-save"></i> Save instance</button>
-                                <button class="btn btn-outline-danger" type="button" onclick="deleteStarr('<?= $app ?>', '<?= $instance ?>')"><i class="fas fa-trash-alt"></i> Delete instance</button>
+                                <button class="btn btn-outline-info" type="button" onclick="testStarr('<?= $app ?>', '<?= $instance ?>')"><i class="fas fa-network-wired"></i> Test API</button>
+                                <button class="btn btn-outline-success" type="button" onclick="saveStarr('<?= $app ?>', '<?= $instance ?>')"><i class="fas fa-save"></i> Save</button>
+                                <button class="btn btn-outline-danger" type="button" onclick="deleteStarr('<?= $app ?>', '<?= $instance ?>')"><i class="fas fa-trash-alt"></i> Delete</button>
                             </td>
                         </tr>
                         <?php
@@ -48,9 +52,11 @@
                     <td></td>
                     <td><input type="text" class="form-control" id="instance-url-99" placeholder="http://localhost:1111"></td>
                     <td><input type="text" class="form-control" id="instance-apikey-99" placeholder="12345-67890-09876-54321"></td>
+                    <td><input type="text" class="form-control" id="instance-username-99" placeholder="username"></td>
+                    <td><input type="text" class="form-control" id="instance-password-99" placeholder="password"></td>
                     <td align="center">
-                        <button class="btn btn-outline-info" type="button" onclick="testStarr('<?= $app ?>', '99')"><i class="fas fa-network-wired"></i> Test</button>
-                        <button class="btn btn-outline-success" type="button" onclick="saveStarr('<?= $app ?>', '99')"><i class="fas fa-plus-circle"></i> Add instance</button>
+                        <button class="btn btn-outline-info" type="button" onclick="testStarr('<?= $app ?>', '99')"><i class="fas fa-network-wired"></i> Test API</button>
+                        <button class="btn btn-outline-success" type="button" onclick="saveStarr('<?= $app ?>', '99')"><i class="fas fa-plus-circle"></i> Add</button>
                     </td>
                 </tr>
             </tbody>

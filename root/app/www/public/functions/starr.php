@@ -139,3 +139,68 @@ function accessCounter($app, $id, $code = 200)
 
     setFile(APP_USAGE_FILE, $usageFile);
 }
+
+function downloadStarrBackup($starrBackup, $starr)
+{
+    $cookie = '';
+    if ($starr['username'] && $starr['password']) {
+        shell_exec('curl -c ' . APP_DATA_PATH . 'cookie.txt -X POST -d "username=' . $starr['username'] . '" -d "password=' . $starr['password'] . '" "' . $starr['url'] . '/login"');
+        $cookies = extractCookies(file_get_contents(APP_DATA_PATH . 'cookie.txt'));
+
+        if ($cookies[0]['name']) {
+            $cookie = $cookies[0]['name'] . '=' . $cookies[0]['value'];
+        }
+    }
+
+    $starrBackup = $starr['url'] . $starrBackup;
+    $proxyBackup = basename($starrBackup);
+
+    $localbackup = fopen(APP_BACKUP_PATH . $proxyBackup, 'wb');
+    $ch = curl_init();
+    curl_setopt($ch, CURLOPT_URL, $starrBackup);
+    curl_setopt($ch, CURLOPT_HTTPHEADER, ['Cookie: ' . $cookie]);
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+    curl_setopt($ch, CURLOPT_FILE, $localbackup);
+    curl_exec($ch);
+    curl_close($ch);
+    fclose($localbackup);
+
+    if (file_exists(APP_DATA_PATH . 'cookie.txt')) {
+        unlink(APP_DATA_PATH . 'cookie.txt');
+    }
+
+    return file_exists(APP_BACKUP_PATH . $proxyBackup) ? APP_BACKUP_PATH . $proxyBackup : '';
+}
+
+function extractCookies($string) {
+    $lines = explode(PHP_EOL, $string);
+
+    foreach ($lines as $line) {
+        if (substr($line, 0, 10) == '#HttpOnly_') {
+            $line = substr($line, 10);
+            $cookie['httponly'] = true;
+        } else {
+            $cookie['httponly'] = false;
+        } 
+
+        // we only care for valid cookie def lines
+        if (strlen( $line ) > 0 && $line[0] != '#' && substr_count($line, "\t") == 6) {
+            $tokens     = explode("\t", $line);
+            $tokens     = array_map('trim', $tokens);
+            $cookie     = [
+                            'domain'            => $tokens[0],
+                            'flag'              => $tokens[1],
+                            'path'              => $tokens[2],
+                            'secure'            => $tokens[3],
+                            'expiration-epoch'  => $tokens[4],
+                            'name'              => urldecode($tokens[5]),
+                            'value'             => urldecode($tokens[6]),
+                            'expiration'        => date('Y-m-d h:i:s', $tokens[4])
+                        ];
+
+            $cookies[] = $cookie;
+        }
+    }
+
+    return $cookies ?: [];
+}

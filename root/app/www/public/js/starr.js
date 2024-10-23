@@ -41,7 +41,7 @@ function saveStarr(app, instance)
     $.ajax({
         type: 'POST',
         url: 'ajax.php',
-        data: '&m=saveStarr&app=' + app + '&instance=' + instance + '&url=' + $('#instance-url-' + instance).val() + '&apikey=' + $('#instance-apikey-' + instance).val(),
+        data: '&m=saveStarr&app=' + app + '&instance=' + instance + '&url=' + $('#instance-url-' + instance).val() + '&apikey=' + $('#instance-apikey-' + instance).val() + '&username=' + encodeURIComponent($('#instance-username-' + instance).val()) + '&password=' + encodeURIComponent($('#instance-password-' + instance).val()),
         success: function () {
             window.location.href = '?app=' + app;
         }
