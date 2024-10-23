@@ -7,8 +7,15 @@
 ----------------------------------
 */
 
-$logList = getLogs();
+if (!$_SESSION) {
+    session_start();
+}
 
+if (!$_SESSION['IN_UI']) {
+    exit('Invalid session, refresh the page');
+}
+
+$logList = getLogs();
 ?>
 
 <div class="row p3">

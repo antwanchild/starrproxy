@@ -20,5 +20,6 @@ define('APP_URL', ($_SERVER['REQUEST_SCHEME'] ?: 'http') . '://'. $_SERVER['HTTP
 
 define('LOG_AGE', 2); //-- DELETE AFTER THIS AMOUNT OF DAYS
 define('BACKUP_AGE', 7); //-- DELETE AFTER THIS AMOUNT OF DAYS
+define('STARR_BACKUP_AGE', 2); //-- DELETE AFTER THIS AMOUNT OF DAYS
 
 $starrApps = ['lidarr', 'prowlarr', 'radarr', 'readarr', 'sonarr', 'whisparr'];

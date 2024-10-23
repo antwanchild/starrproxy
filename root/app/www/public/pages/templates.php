@@ -7,8 +7,15 @@
 ----------------------------------
 */
 
-$templateList = getTemplateList();
+if (!$_SESSION) {
+    session_start();
+}
 
+if (!$_SESSION['IN_UI']) {
+    exit('Invalid session, refresh the page');
+}
+
+$templateList = getTemplateList();
 ?>
 
 <div class="row p3">

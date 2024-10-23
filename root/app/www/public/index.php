@@ -7,6 +7,12 @@
 ----------------------------------
 */
 
+if (!$_SESSION) {
+    session_start();
+}
+
+$_SESSION['IN_UI'] = true;
+
 require 'loader.php';
 require ABSOLUTE_PATH . 'includes/header.php';
 

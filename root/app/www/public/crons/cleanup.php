@@ -34,7 +34,7 @@ if (is_dir(APP_LOG_PATH)) {
         }
 
         if (filemtime($logfile) <= (time() - (86400 * LOG_AGE))) {
-            echo date('c') . ' removing old logfile \''. $logfile .'\''."\n";
+            echo date('c') . ' removing old logfile \'' . $logfile . '\''."\n";
             shell_exec('rm ' . $logfile);
         }
     }
@@ -49,8 +49,10 @@ if (is_dir(APP_BACKUP_PATH)) {
 
         //-- NOTIFIARR CORRUPTION CHECKS
         if (str_contains($backupFolder, '.zip')) {
-            echo date('c') . ' removing old starr backup \''. $backupFolder .'\''."\n";
-            shell_exec('rm ' . $backupFolder);            
+            if (filemtime($backupFolder) <= (time() - (86400 * STARR_BACKUP_AGE))) {
+                echo date('c') . ' removing old starr backup \'' . $backupFolder . '\''."\n";
+                shell_exec('rm ' . $backupFolder);
+            }
         }
 
         if (!is_dir($backupFolder) || $folder[0] == '.') {
@@ -58,7 +60,7 @@ if (is_dir(APP_BACKUP_PATH)) {
         }
 
         if (filemtime($backupFolder) <= (time() - (86400 * BACKUP_AGE))) {
-            echo date('c') . ' removing old backup \''. $backupFolder .'\''."\n";
+            echo date('c') . ' removing old backup \'' . $backupFolder . '\''."\n";
             shell_exec('rm -r ' . $backupFolder);
         }
     }

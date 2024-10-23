@@ -6,6 +6,14 @@
  ------  Austin Best	   ------
 ----------------------------------
 */
+
+if (!$_SESSION) {
+    session_start();
+}
+
+if (!$_SESSION['IN_UI']) {
+    exit('Invalid session, refresh the page');
+}
 ?>
 
 <div class="card mb-3">
