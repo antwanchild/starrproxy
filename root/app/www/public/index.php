@@ -20,7 +20,7 @@ require ABSOLUTE_PATH . 'includes/header.php';
             <li class="breadcrumb-item active"><?= ucfirst($app) ?></li>
         </ol>
         <?php
-        require ABSOLUTE_PATH . 'starr.php';
+        require ABSOLUTE_PATH . 'pages/starr.php';
     } elseif ($page) {
         ?>
         <ol class="breadcrumb">
@@ -32,14 +32,14 @@ require ABSOLUTE_PATH . 'includes/header.php';
             <?php } ?>
         </ol>
         <?php
-        require ABSOLUTE_PATH . $page . '.php';
+        require ABSOLUTE_PATH . 'pages/' . $page . '.php';
     } else {
         ?>
         <ol class="breadcrumb">
             <li class="breadcrumb-item active">Home</li>
         </ol>
         <?php
-        require ABSOLUTE_PATH . 'home.php';
+        require ABSOLUTE_PATH . 'pages/home.php';
     }
     ?>
 </div>

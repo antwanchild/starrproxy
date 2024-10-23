@@ -17,7 +17,7 @@ function testStarr(app, instance)
 
     $.ajax({
         type: 'POST',
-        url: 'ajax.php',
+        url: 'ajax/starr.php',
         data: '&m=testStarr&app=' + app + '&url=' + $('#instance-url-' + instance).val() + '&apikey=' + apikey,
         dataType: 'json',
         success: function (resultData) {
@@ -40,7 +40,7 @@ function saveStarr(app, instance)
 
     $.ajax({
         type: 'POST',
-        url: 'ajax.php',
+        url: 'ajax/starr.php',
         data: '&m=saveStarr&app=' + app + '&instance=' + instance + '&url=' + $('#instance-url-' + instance).val() + '&apikey=' + $('#instance-apikey-' + instance).val() + '&username=' + encodeURIComponent($('#instance-username-' + instance).val()) + '&password=' + encodeURIComponent($('#instance-password-' + instance).val()),
         success: function () {
             window.location.href = '?app=' + app;
@@ -53,7 +53,7 @@ function deleteStarr(app, instance)
     if (confirm('Are you sure you want to delete this ' + app + ' instance?')) {
         $.ajax({
             type: 'POST',
-            url: 'ajax.php',
+            url: 'ajax/starr.php',
             data: '&m=deleteStarr&app=' + app + '&instance=' + instance,
             success: function () {
                 window.location.href = '?app=' + app;
@@ -66,7 +66,7 @@ function openAppStarrAccess(app, id, clone = '')
 {
     $.ajax({
         type: 'POST',
-        url: 'ajax.php',
+        url: 'ajax/starr.php',
         data: '&m=newAppStarrAccess&app=' + app + '&id=' + id + '&clone=' + clone,
         success: function (resultData) {
             dialogOpen({
@@ -107,7 +107,7 @@ function saveAppStarrAccess(app, id)
 
     $.ajax({
         type: 'POST',
-        url: 'ajax.php',
+        url: 'ajax/starr.php',
         data: '&m=saveAppStarrAccess&app=' + app + '&name=' + $('#access-name').val() + '&apikey=' + $('#access-apikey').val() + '&id=' + id + '&instances=' + $('#access-instances').val() + params,
         success: function () {
             window.location.href = '?app=' + app;
@@ -120,7 +120,7 @@ function deleteAppStarrAccess(app, id)
     if (confirm('Are you sure you want to delete this apps access to ' + app + '?')) {
         $.ajax({
             type: 'POST',
-            url: 'ajax.php',
+            url: 'ajax/starr.php',
             data: '&m=deleteAppStarrAccess&app=' + app + '&id=' + id,
             success: function () {
                 window.location.href = '?app=' + app;
@@ -133,7 +133,7 @@ function openAppAccessLog(starr, appIndex, app, key)
 {
     $.ajax({
         type: 'POST',
-        url: 'ajax.php',
+        url: 'ajax/starr.php',
         data: '&m=openAppAccessLog&accessApp=' + app + '&accessId=' + appIndex + '&key=' + key + '&app=' + starr,
         success: function (resultData) {
             dialogOpen({
@@ -150,7 +150,7 @@ function openTemplateStarrAccess(app, id)
 {
     $.ajax({
         type: 'POST',
-        url: 'ajax.php',
+        url: 'ajax/starr.php',
         data: '&m=openTemplateStarrAccess&app=' + app + '&id=' + id,
         success: function (resultData) {
             dialogOpen({
@@ -172,7 +172,7 @@ function saveTemplateStarrAccess(app, id)
 
     $.ajax({
         type: 'POST',
-        url: 'ajax.php',
+        url: 'ajax/starr.php',
         data: '&m=saveTemplateStarrAccess&app=' + app + '&id=' + id + '&name=' + encodeURIComponent($('#new-template-name').val()),
         success: function () {
             dialogClose('openTemplateStarrAccess');
@@ -186,7 +186,7 @@ function resetUsage(app, id)
     if (confirm('Are you sure you want to reset the usage counter?')) {
         $.ajax({
             type: 'POST',
-            url: 'ajax.php',
+            url: 'ajax/starr.php',
             data: '&m=resetUsage&app=' + app + '&id=' + id,
             success: function () {
                 window.location.href = '?app=' + app;
@@ -199,7 +199,7 @@ function addEndpointAccess(app, id, endpoint, method, endpointHash)
 {
     $.ajax({
         type: 'POST',
-        url: 'ajax.php',
+        url: 'ajax/starr.php',
         data: '&m=addEndpointAccess&app=' + app + '&id=' + id + '&endpoint=' + endpoint + '&method=' + method,
         success: function () {
             $('#disallowed-endpoint-' + endpointHash + ', #allowed-endpoint-' + endpointHash).toggle();

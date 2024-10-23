@@ -8,14 +8,16 @@
 */
 
 if (!defined('ABSOLUTE_PATH')) {
-    if (file_exists('loader.php')) {
-        define('ABSOLUTE_PATH', './');
-    }
-    if (file_exists('../loader.php')) {
-        define('ABSOLUTE_PATH', '../');
-    }
-    if (file_exists('../../loader.php')) {
-        define('ABSOLUTE_PATH', '../../');
+    if (is_dir('app')) {
+        define('ABSOLUTE_PATH', 'app/www/public/');
+    } else {
+        if (file_exists('loader.php')) {
+            define('ABSOLUTE_PATH', './');
+        } elseif (file_exists('../loader.php')) {
+            define('ABSOLUTE_PATH', '../');
+        } elseif (file_exists('../../loader.php')) {
+            define('ABSOLUTE_PATH', '../../');
+        }
     }
 }
 
@@ -44,6 +46,12 @@ if (is_dir(APP_BACKUP_PATH)) {
     $dir = opendir(APP_BACKUP_PATH);
     while ($folder = readdir($dir)) {
         $backupFolder = APP_BACKUP_PATH . $folder;
+
+        //-- NOTIFIARR CORRUPTION CHECKS
+        if (str_contains($backupFolder, '.zip')) {
+            echo date('c') . ' removing old starr backup \''. $backupFolder .'\''."\n";
+            shell_exec('rm ' . $backupFolder);            
+        }
 
         if (!is_dir($backupFolder) || $folder[0] == '.') {
             continue;

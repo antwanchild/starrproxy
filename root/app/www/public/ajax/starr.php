@@ -2,12 +2,12 @@
 
 /*
 ----------------------------------
- ------  Created: 101124   ------
+ ------  Created: 102324   ------
  ------  Austin Best	   ------
 ----------------------------------
 */
 
-require 'loader.php';
+require '../loader.php';
 
 if ($_POST['m'] == 'testStarr') {
     $test = testStarrConnection($app, $_POST['url'], $_POST['apikey']);
@@ -193,50 +193,6 @@ if ($_POST['m'] == 'deleteAppStarrAccess') {
     setFile(APP_SETTINGS_FILE, $settingsFile);
 }
 
-if ($_POST['m'] == 'openAppAccessLog') {
-    getLog($_POST['accessApp'], $app);
-}
-
-if ($_POST['m'] == 'openTemplateStarrAccess') {
-    ?>
-    <table class="table table-bordered table-hover">
-        <tr>
-            <td>Path</td>
-            <td><?= APP_USER_TEMPLATES_PATH . $_POST['app'] ?>/*.json</td>
-        </tr>
-        <tr>
-            <td>Name<br><span class="text-small">[a-zA-Z0-9 _-]</span></td>
-            <td><input id="new-template-name" type="text" class="form-control" placeholder="notifiarr"></td>
-        </tr>
-        <tr>
-            <td colspan="2" align="center"><button class="btn btn-outline-success" onclick="saveTemplateStarrAccess('<?= $_POST['app'] ?>', <?= $_POST['id'] ?>)">Add template</button></td>
-        </tr>
-    </table>
-    Notes:<br>
-    <ul>
-        <li>Using an existing template name will overwrite it</li>
-    </ul>
-    <?php
-}
-
-if ($_POST['m'] == 'saveTemplateStarrAccess') {
-    $endpoints  = $settingsFile['access'][$app][$_POST['id']]['endpoints'];
-    $name       = strtolower(preg_replace('/[^a-zA-Z0-9 _-]/', '', $_POST['name']));
-    file_put_contents(APP_USER_TEMPLATES_PATH . $app . '/' . $name . '.json', json_encode($endpoints, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES));
-}
-
-if ($_POST['m'] == 'viewTemplate') {
-    $template = file_get_contents($_POST['template']);
-    list($starr, $app) = explode('/', $_POST['template']);
-    ?>
-    <pre><i class="far fa-copy fa-2x text-info" style="cursor: pointer; float: right;" onclick="clipboard('template-json', 'html')" title="Copy template to clipboard"></i><span id="template-json"><?= $template ?></span></pre>
-    <?php
-}
-
-if ($_POST['m'] == 'applyTemplateOptions') {
-    echo file_get_contents($_POST['template']);
-}
-
 if ($_POST['m'] == 'resetUsage') {
     unset($usageFile[$app][$_POST['id']]);
     setFile(APP_USAGE_FILE, $usageFile);
@@ -246,16 +202,4 @@ if ($_POST['m'] == 'addEndpointAccess') {
     $settingsFile['access'][$app][$_POST['id']]['endpoints'][$_POST['endpoint']][] = $_POST['method'];
     print_r($settingsFile['access'][$app][$_POST['id']]);
     setFile(APP_SETTINGS_FILE, $settingsFile);
-}
-
-if ($_POST['m'] == 'deleteCustomTemplate') {
-    unlink(APP_USER_TEMPLATES_PATH . $_POST['starr'] . '/' . $_POST['app'] . '.json');
-}
-
-if ($_POST['m'] == 'viewLog') {
-    getLog($_POST['log']);
-}
-
-if ($_POST['m'] == 'deleteLog') {
-    unlink(APP_LOG_PATH . $_POST['log']);
 }

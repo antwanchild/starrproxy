@@ -5,7 +5,7 @@ function viewTemplate(template, index)
 
     $.ajax({
         type: 'POST',
-        url: 'ajax.php',
+        url: 'ajax/templates.php',
         data: '&m=viewTemplate&template=' + template,
         success: function (resultData) {
             $('#template-viewer').html(resultData)
@@ -25,7 +25,7 @@ function applyTemplateOptions()
 
     $.ajax({
         type: 'POST',
-        url: 'ajax.php',
+        url: 'ajax/templates.php',
         data: '&m=applyTemplateOptions&template=' + $('#access-template').val(),
         dataType: 'json',
         success: function (resultData) {
@@ -52,7 +52,7 @@ function deleteCustomTemplate(app, starr)
     if (confirm('Are you sure you want to delete this template?')) {
         $.ajax({
             type: 'POST',
-            url: 'ajax.php',
+            url: 'ajax/templates.php',
             data: '&m=deleteCustomTemplate&app=' + app + '&starr=' + starr,
             success: function () {
                 reload();
