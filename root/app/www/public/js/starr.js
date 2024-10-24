@@ -129,23 +129,6 @@ function deleteAppStarrAccess(app, id)
     }
 }
 // -------------------------------------------------------------------------------------------
-function openAppAccessLog(starr, appIndex, app, key)
-{
-    $.ajax({
-        type: 'POST',
-        url: 'ajax/starr.php',
-        data: '&m=openAppAccessLog&accessApp=' + app + '&accessId=' + appIndex + '&key=' + key + '&app=' + starr,
-        success: function (resultData) {
-            dialogOpen({
-                id: 'openAppAccessLog',
-                title: 'Access log viewer: ' + app + ' (filter: ' + key + ')',
-                size: 'xxl',
-                body: resultData
-            });
-        }
-    });
-}
-// -------------------------------------------------------------------------------------------
 function openTemplateStarrAccess(app, id)
 {
     $.ajax({
