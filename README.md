@@ -4,7 +4,7 @@
 
 ## Note!
 
-This is still very much in development (mainly the templates) and being tested. There will be force pushes until the "base" code is stable and then a normal commit process will start.
+This is still very much in development (mainly the templates) and being tested. Feel free to join the Notifiarr discord and ask questions in the `#starrproxy` channel
 
 ## Purpose
 
@@ -128,10 +128,14 @@ Name: `TZ`, Key: `TZ`, Value: `America/New_York`
 
 ## Screenshots
 
-When viewing the access log for an allowed app, endpoints tab contains all the endpoints referenced in the log and if the app has access or not. Clicking the red x allows access.
+When viewing the access log for an allowed app, an endpoints tab contains all the endpoints referenced in the log and if the app has access or not. Clicking the red x allows access.
 
 ![Usage](root/app/www/public/images/screenshots/endpointUsage.png)
 
 Easily view apps, what they access, etc
 
 ![Apps](root/app/www/public/images/screenshots/apps.png)
+
+Some basic stats
+
+![Apps](root/app/www/public/images/screenshots/stats.png)
