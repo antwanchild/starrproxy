@@ -129,41 +129,6 @@ function deleteAppStarrAccess(app, id)
     }
 }
 // -------------------------------------------------------------------------------------------
-function openTemplateStarrAccess(app, id)
-{
-    $.ajax({
-        type: 'POST',
-        url: 'ajax/starr.php',
-        data: '&m=openTemplateStarrAccess&app=' + app + '&id=' + id,
-        success: function (resultData) {
-            dialogOpen({
-                id: 'openTemplateStarrAccess',
-                title: 'Create new template for ' + app,
-                size: 'lg',
-                body: resultData
-            });
-        }
-    });
-}
-// -------------------------------------------------------------------------------------------
-function saveTemplateStarrAccess(app, id)
-{
-    if (!$('#new-template-name').val()) {
-        toast('Templates', 'Template name is required', 'error');
-        return;
-    }
-
-    $.ajax({
-        type: 'POST',
-        url: 'ajax/starr.php',
-        data: '&m=saveTemplateStarrAccess&app=' + app + '&id=' + id + '&name=' + encodeURIComponent($('#new-template-name').val()),
-        success: function () {
-            dialogClose('openTemplateStarrAccess');
-            toast('Templates', 'The template has been added', 'info');
-        }
-    });
-}
-// -------------------------------------------------------------------------------------------
 function resetUsage(app, id)
 {
     if (confirm('Are you sure you want to reset the usage counter?')) {
