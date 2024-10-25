@@ -73,6 +73,9 @@ if (!$_SESSION['IN_UI']) {
                         <li class="nav-item">
                             <a class="nav-link <?= $page == 'help' ? 'active' : '' ?>" href="/?page=help"><i class="far fa-question-circle"></i> <span class="me-3">Help</span></a>
                         </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="https://github.com/Notifiarr/starrproxy" target="_blank"><i class="fab fa-github"></i> <span class="me-3">Github</span></a>
+                        </li>
                     </ul>
                 </div>
             </div>

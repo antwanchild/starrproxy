@@ -19,7 +19,15 @@ if (!$_SESSION['IN_UI']) {
 <div class="col-sm-12 p3">
     <h2>Help</h2>
     <h5 class="mt-3 text-warning">Usage</h5>
-    Add your starr apps to the system, then create proxy access for the app by adding a 3<sup>rd</sup> party app<br>
+    Add your starr apps to the system, then create proxy access for the starr app by adding a 3<sup>rd</sup> party app/script and settings its access permissions<br>
+
+    <h5 class="mt-4 text-warning">App permissions and templates</h5>
+    There are applied settings, templates & custom templates. Templates are not "saved" with the app but instead "applied" to the app as a way to quickly setup basic access for it.
+    <ul>
+        <li>Settings: This is what the system uses to allow/reject access to an app. It is the list of endpoints when you modify an app.</li>
+        <li>Native template: This is a pre-built list of what an app uses that can be used as a starting point. It will disable/enable the endpoints needed to allow that app to function and then you can customize the selection after.</li>
+        <li>Custom template: This has the same use case as the native ones but allow for custom apps or scripts to have a pre-built list of endpoints in case you add it multiple times.</li>
+    </ul>
 
     <h5 class="mt-4 text-warning">Giving a new app access</h5>
     Existing templates:<br>
