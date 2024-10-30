@@ -31,7 +31,7 @@ function getTemplateList()
 {
     global $starrApps;
 
-    $templateLocations = ['templates/', APP_USER_TEMPLATES_PATH];
+    $templateLocations = [ABSOLUTE_PATH . 'templates/', APP_USER_TEMPLATES_PATH];
     $list = [];
     foreach ($starrApps as $starrApp) {
         foreach ($templateLocations as $templateLocation) {

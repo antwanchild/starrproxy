@@ -54,7 +54,7 @@ if ($_POST['m'] == 'viewTemplate') {
 }
 
 if ($_POST['m'] == 'applyTemplateOptions') {
-    echo file_get_contents(ABSOLUTE_PATH . $_POST['template']);
+    echo file_get_contents($_POST['template']);
 }
 
 if ($_POST['m'] == 'deleteCustomTemplate') {
