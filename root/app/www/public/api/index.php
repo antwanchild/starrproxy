@@ -145,21 +145,41 @@ if ($internalEndpoint) {
         $app    = $proxiedApp['starr'];
         $appId  = $proxiedApp['appId'];
 
+        // CHECK IF THE ENDPOINT HAS WILDCARDS: /{...}/{...} OR /{...}
         if (!$proxiedApp['access'][$endpoint]) {
-            $parameter = false;
-            preg_match('/^(.*)\/(.*)$/', $endpoint, $matches);
-            $cleanEndpoint = $matches[1] . '/{';
+            $endpointRegexes    = ['/(.*)\/(.*)\/(.*)/', '/(.*)\/(.*)/'];
+            $wildcardRegexes    = ['/(.*)({.*})\/({.*})/', '/(.*)({.*})/'];
+            $wildcard           = false;
+
+            foreach ($wildcardRegexes as $index => $wildcardRegex) {
+                preg_match($endpointRegexes[$index], $endpoint, $requestMatches);
+
+                if (!$requestMatches) {
+                    continue;
+                }
+
+                foreach ($proxiedApp['access'] as $accessEndpoint => $accessMethods) {
+                    preg_match($wildcardRegex, $accessEndpoint, $accessMatches);
     
-            // CHECK IF THE ENDPOINT HAS /{...}
-            foreach ($proxiedApp['access'] as $accessEndpoint => $accessMethods) {
-                if (str_contains($accessEndpoint, $cleanEndpoint)) {
-                    $parameter  = true;
-                    $endpoint   = $accessEndpoint; //-- ALLOW LATER CHECKS TO PASS
+                    if (!$accessMatches) {
+                        continue;
+                    }
+
+                    if ($accessMatches[1] == $requestMatches[1] . '/') {
+                        if (count($accessMatches) == count($requestMatches)) {
+                            $wildcard   = true;
+                            $endpoint   = $accessEndpoint; //-- ALLOW LATER CHECKS TO PASS
+                            break;
+                        }
+                    }
+                }
+
+                if ($wildcard) {
                     break;
                 }
             }
 
-            if (!$parameter) {
+            if (!$wildcard) {
                 logger($logfile, $apikey, $endpoint, 401);
                 logger(str_replace('access.log', 'access_' . $settingsFile['access'][$app][$appId]['name'] . '.log', $logfile), $apikey, $endpoint, 401);
                 accessCounter($app, $appId, 401);
