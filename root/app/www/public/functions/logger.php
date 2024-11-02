@@ -121,13 +121,11 @@ function getLog($log, $app = false)
                 <h4>Endpoint usage <span class="text-small">(<?= count($endpointUsage) ?> endpoint<?= count($endpointUsage) == 1 ? '' : 's' ?>)</span></h4>
                 <?php
                 foreach ($endpointUsage as $endpoint => $methods) {
-                    $endpoint = strtolower($endpoint);
-
                     foreach ($methods as $method => $usage) {
                         $accessError = true;
 
-                        if ($proxiedApp['access'][$endpoint]) {
-                            if (in_array(strtolower($method), $proxiedApp['access'][$endpoint])) {
+                        if ($proxiedApp['access'][$endpoint] || $proxiedApp['access'][strtolower($endpoint)]) {
+                            if (in_array(strtolower($method), $proxiedApp['access'][$endpoint]) || in_array(strtolower($method), $proxiedApp['access'][strtolower($endpoint)])) {
                                 $accessError = false;
                             }
                         }

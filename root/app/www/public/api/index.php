@@ -198,9 +198,18 @@ if ($internalEndpoint) {
         $request    = curl($starrUrl, ['X-Api-Key:' . $proxiedApp['app']['apikey']], $method, $json);
 
         logger($logfile, $apikey, $endpoint, 200, $request['code']);
-        logger(str_replace('access.log', 'access_' . $settingsFile['access'][$app][$appId]['name'] . '.log', $logfile), $apikey, $endpoint, 200, $request['code'], $request);
+        logger(str_replace('access.log', 'access_' . $settingsFile['access'][$app][$appId]['name'] . '.log', $logfile), $apikey, $originalEndpoint, 200, $request['code'], $request);
         accessCounter($app, $appId, $request['code']);
 
-        apiResponse($request['code'], $request['response']);
+        if (str_contains($endpoint, 'mediacover')) { //-- OUTPUT THE REQUESTED IMAGE
+            foreach ($request['responseHeaders'] as $rhKey => $rhVal) {
+                header($rhKey . ': ' . $rhVal[0]);
+            }
+
+            echo $request['response'];
+            exit();
+        } else { //-- RETURN THE JSON API RESPONSE
+            apiResponse($request['code'], $request['response'], $request['responseHeaders']);
+        }
     }
 }

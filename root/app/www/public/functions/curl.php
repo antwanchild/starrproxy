@@ -56,6 +56,24 @@ function curl($url, $headers = [], $method = 'GET', $payload = '', $userPass = [
         curl_setopt($ch, CURLOPT_HTTPAUTH, CURLAUTH_BASIC);
     }
 
+    $responseHeaders = [];
+    curl_setopt(
+        $ch,
+        CURLOPT_HEADERFUNCTION,
+        function ($curl, $header) use (&$responseHeaders) {
+            $len    = strlen($header);
+            $header = explode(':', $header, 2);
+
+            if (count($header) < 2) {
+                return $len;
+            }
+
+            $responseHeaders[trim($header[0])][] = trim($header[1]);
+
+            return $len;
+        }
+    );
+
     $response       = curl_exec($ch);
     $jsonResponse   = json_decode($response, true);
     $response       = !empty($jsonResponse) ? $jsonResponse : $response;
@@ -63,11 +81,12 @@ function curl($url, $headers = [], $method = 'GET', $payload = '', $userPass = [
     $code           = curl_getinfo($ch, CURLINFO_HTTP_CODE);
 
     return [
-            'url'       => $url,
-            'method'    => $method,
-            'payload'   => $payload,
-            'response'  => $response,
-            'error'     => $error,
-            'code'      => $code
+            'url'               => $url,
+            'method'            => $method,
+            'payload'           => $payload,
+            'responseHeaders'   => $responseHeaders,
+            'response'          => $response,
+            'error'             => $error,
+            'code'              => $code
         ];
 }
