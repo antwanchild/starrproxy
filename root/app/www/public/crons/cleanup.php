@@ -8,8 +8,8 @@
 */
 
 if (!defined('ABSOLUTE_PATH')) {
-    if (is_dir('app')) {
-        define('ABSOLUTE_PATH', 'app/www/public/');
+    if (is_dir('/app')) {
+        define('ABSOLUTE_PATH', '/app/www/public/');
     } else {
         if (file_exists('loader.php')) {
             define('ABSOLUTE_PATH', './');
