@@ -23,6 +23,10 @@ function apiResponse($code, $response, $responseHeaders = [])
 
     if ($responseHeaders) {
         foreach ($responseHeaders as $rhKey => $rhVal) {
+            if ($code[0] != '3' && $rhKey == 'Location') {
+                continue;
+            }
+
             header($rhKey . ': ' . $rhVal[0]);
         }
     } else {
