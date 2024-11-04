@@ -18,7 +18,7 @@ if (!$_SESSION['IN_UI']) {
 require '../loader.php';
 
 if ($_POST['m'] == 'testStarr') {
-    $test = testStarrConnection($app, $_POST['url'], $_POST['apikey']);
+    $test = $starr->testConnection($app, $_POST['url'], $_POST['apikey']);
 
     $error = $result = '';
     if ($test['code'] != 200) {
@@ -31,11 +31,18 @@ if ($_POST['m'] == 'testStarr') {
 }
 
 if ($_POST['m'] == 'deleteStarr') {
-    unset($settingsFile[$app][$_POST['instance']]);
-    setFile(APP_SETTINGS_FILE, $settingsFile);
+    $error = $proxyDb->deleteStarrApp($_POST['starrId']);
+
+    if (!$error) {
+        $usageDb->deleteStarrAppUsage($_POST['starrId']);
+    }
+
+    echo $error;
 }
 
 if ($_POST['m'] == 'saveStarr') {
+    $error = '';
+
     //-- SOME BASIC SANITY CHECKING
     if (!str_contains($_POST['url'], 'http')) {
         $_POST['url'] = 'http://' . $_POST['url'];
@@ -44,30 +51,36 @@ if ($_POST['m'] == 'saveStarr') {
     $_POST['url'] = rtrim($_POST['url'], '/');
 
     //-- GET THE INSTANCE NAME
-    $test = testStarrConnection($app, $_POST['url'], $_POST['apikey']);
+    $test = $starr->testConnection($app, $_POST['url'], $_POST['apikey']);
     $name = 'ERROR';
 
     if ($test['code'] == 200) {
         $name = $test['response']['instanceName'];
     }
 
-    //-- NEW INSTANCE
-    if ($_POST['instance'] == '99') {
-        $settingsFile[$app][] = ['name' => $name, 'url' => $_POST['url'], 'apikey' => $_POST['apikey'], 'username' => rawurldecode($_POST['username']), 'password' => rawurldecode($_POST['password'])];
+    $fields = [
+                'name'      => $name, 
+                'url'       => $_POST['url'], 
+                'apikey'    => $_POST['apikey'], 
+                'username'  => rawurldecode($_POST['username']), 
+                'password'  => rawurldecode($_POST['password'])
+            ];
+
+    if ($_POST['starrId'] == '99') {
+        $error = $proxyDb->addStarrApp($app, $fields);
     } else {
-        if ($_POST['instance'] >= 0) {
-            $settingsFile[$app][$_POST['instance']] = ['name' => $name, 'url' => $_POST['url'], 'apikey' => $_POST['apikey'], 'username' => rawurldecode($_POST['username']), 'password' => rawurldecode($_POST['password'])];
-        }
+        $error = $proxyDb->updateStarrApp($_POST['starrId'], $fields);
     }
 
-    setFile(APP_SETTINGS_FILE, $settingsFile);
+    echo $error;
 }
 
-if ($_POST['m'] == 'newAppStarrAccess') {
-    $existing       = $_POST['id'] != 99 ? $settingsFile['access'][$app][$_POST['id']] : [];
-    $clone          = isset($_POST['clone']) ? $settingsFile['access'][$app][$_POST['clone']] : [];
-    $endpoints      = getStarrEndpoints($app);
-    $appInstances   = '';
+if ($_POST['m'] == 'openAppStarrAccess') {
+    $existing               = $proxyDb->getAppFromId($_POST['id'], $appsTable);
+    $existing['endpoints']  = $existing['endpoints'] ? json_decode($existing['endpoints'], true) : [];
+    $clone                  = isset($_POST['clone']) ? $proxyDb->getAppFromId($_POST['clone'], $appsTable) : [];
+    $endpoints              = $starr->getEndpoints($app);
+    $appInstances           = '';
 
     if ($clone) {
         $existing = $clone;
@@ -75,9 +88,13 @@ if ($_POST['m'] == 'newAppStarrAccess') {
         $existing['name'] .= ' - Clone';
     }
 
-    if ($settingsFile[$app]) {
-        foreach ($settingsFile[$app] as $instance => $instanceSettings) {
-            $appInstances .= '<option ' . (isset($existing['instances']) && $instance == $existing['instances'] ? 'selected ' : '') . 'value="' . $instance . '">' . $instanceSettings['name'] . ' (' . $instanceSettings['url'] . ')</option>';
+    if ($starrsTable) {
+        foreach ($starrsTable as $starrInstance) {
+            if ($starrInstance['starr'] != $starr->getStarrInterfaceIdFromName($app)) {
+                continue;
+            }
+
+            $appInstances .= '<option ' . ($existing && $starrInstance['id'] == $existing['starr_id'] ? 'selected ' : '') . 'value="' . $starrInstance['id'] . '">' . $starrInstance['name'] . ' (' . $starrInstance['url'] . ')</option>';
         }
     }
 
@@ -97,7 +114,7 @@ if ($_POST['m'] == 'newAppStarrAccess') {
         <tr>
             <td><?= ucfirst($app) ?> instance<br><span class="text-small">Select which instance this app will access</span></td>
             <td>
-                <select class="form-select" id="access-instances"><option value="">-- Select instance --</option><?= $appInstances ?></select>
+                <select class="form-select" id="access-instance"><option value="">-- Select instance --</option><?= $appInstances ?></select>
             </td>
         </tr>
         <tr>
@@ -181,33 +198,38 @@ if ($_POST['m'] == 'saveAppStarrAccess') {
         $endpoints[$val][] = $_POST['method-' . $id];
     }
 
-    $access['name']         = $_POST['name'];
-    $access['apikey']       = $_POST['apikey'];
-    $access['instances']    = $_POST['instances'];
-    $access['endpoints']    = $endpoints;
+    $fields['name']         = $_POST['name'];
+    $fields['apikey']       = $_POST['apikey'];
+    $fields['starr_id']     = $_POST['starr_id'];
+    $fields['endpoints']    = $endpoints;
 
     if ($_POST['id'] != 99) {
-        $access['usage'] = $settingsFile['access'][$app][$_POST['id']]['usage'];
-        $settingsFile['access'][$app][$_POST['id']] = $access;
+        $error = $proxyDb->updateApp($_POST['id'], $fields);
     } else {
-        $settingsFile['access'][$app][] = $access;
+        $error = $proxyDb->addApp($fields);
     }
 
-    setFile(APP_SETTINGS_FILE, $settingsFile);
+    echo $error;
 }
 
 if ($_POST['m'] == 'deleteAppStarrAccess') {
-    unset($settingsFile['access'][$app][$_POST['id']]);
-    setFile(APP_SETTINGS_FILE, $settingsFile);
+    $error = $proxyDb->deleteApp($_POST['id']);
+
+    echo $error;
 }
 
 if ($_POST['m'] == 'resetUsage') {
-    unset($usageFile[$app][$_POST['id']]);
-    setFile(APP_USAGE_FILE, $usageFile);
+    $error = $usageDb->resetAppUsage($_POST['id']);
+
+    echo $error;
 }
 
 if ($_POST['m'] == 'addEndpointAccess') {
-    $settingsFile['access'][$app][$_POST['id']]['endpoints'][$_POST['endpoint']][] = $_POST['method'];
-    print_r($settingsFile['access'][$app][$_POST['id']]);
-    setFile(APP_SETTINGS_FILE, $settingsFile);
+    $app = $proxyDb->getAppFromId($_POST['id'], $appsTable);
+    $app['endpoints'] = json_decode($app['endpoints']);
+    $app['endpoints'][$_POST['endpoint']][] = $_POST['method'];
+
+    $error = $proxyDb->updateApp($_POST['id'], $app);
+
+    echo $error;
 }

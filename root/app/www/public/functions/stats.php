@@ -7,17 +7,17 @@
 ----------------------------------
 */
 
-function getTotalAppStats($settings)
+function getTotalAppStats($starrsTable)
 {
+    global $starr;
+
     $stats = [];
 
-    if ($settings) {
-        foreach ($settings as $app => $appSettings) {
-            if ($app == 'access') {
-                continue;
-            }
+    if ($starrsTable) {
+        foreach ($starrsTable as $starrApp) {
+            $app = $starr->getStarrInterfaceNameFromId($starrApp['starr']);
 
-            $stats[$app] = count($settings[$app]);
+            $stats[$app]++;
         }
 
         ksort($stats);
@@ -26,27 +26,35 @@ function getTotalAppStats($settings)
     return $stats;
 }
 
-function getTotalEndpointStats($settings)
+function getTotalEndpointStats($starrsTable, $appsTable)
 {
+    global $starr;
+
+    $starr ??= new Starr();
     $stats = [];
 
-    if ($settings) {
-        foreach ($settings as $app => $appSettings) {
-            if ($app == 'access') {
-                continue;
-            }
-
+    if ($starrsTable) {
+        foreach ($starrsTable as $starrApp) {
+            $app            = $starr->getStarrInterfaceNameFromId($starrApp['starr']);
             $allowed        = 0;
             $total          = 0;
             $apps           = 0;
-            $totalEndpoints = getStarrEndpoints($app);
-            foreach ($settings['access'][$app] as $appSetting) {
-                $allowed += count($appSetting['endpoints']);
-                $total += count($totalEndpoints);
-                $apps++;
+            $totalEndpoints = $starr->getEndpoints($app);
+
+            foreach ($appsTable as $proxiedApp) {
+                if ($proxiedApp['starr_id'] == $starrApp['id']) {
+                    $endpoints  = json_decode($proxiedApp['endpoints'], true);
+                    $allowed    += count($endpoints);
+                    $total      += count($totalEndpoints);
+                    $apps++;
+                }
             }
 
-            $stats[$app] = ['apps' => $apps, 'total' => $total, 'allowed' => $allowed];
+            $stats[$app] = [
+                            'apps'      => ($stats[$app]['apps'] + $apps), 
+                            'total'     => ($stats[$app]['total'] + $total), 
+                            'allowed'   => ($stats[$app]['allowed'] + $allowed)
+                        ];
         }
 
         if ($stats) {
@@ -57,25 +65,33 @@ function getTotalEndpointStats($settings)
     return $stats;
 }
 
-function getTotalUsageStats($settings, $usage)
+function getTotalUsageStats($starrsTable, $appsTable, $usageTable)
 {
-    $stats = [];
-    if ($settings && $usage) {
-        foreach ($settings as $app => $appSettings) {
-            if ($app == 'access') {
-                continue;
-            }
+    global $starr;
 
-            $success    = 0;
+    $stats = [];
+    if ($starrsTable && $appsTable && $usageTable) {
+        foreach ($starrsTable as $starrApp) {
+            $app        = $starr->getStarrInterfaceNameFromId($starrApp['starr']);
+            $allowed    = 0;
             $rejected   = 0;
 
-            if ($usage[$app]) {
-                foreach ($usage[$app] as $appUsage) {
-                    $success += $appUsage['success'];
-                    $rejected += $appUsage['error'];
+            foreach ($appsTable as $proxiedApp) {
+                if ($proxiedApp['starr_id'] == $starrApp['id']) {
+                    foreach ($usageTable as $usage) {
+                        if ($usage['app_id'] == $proxiedApp['id']) {
+                            $allowed += $usage['allowed'];
+                            $rejected += $usage['rejected'];
+                            break;
+                        }
+                    }
                 }
             }
-            $stats[$app] = ['success' => $success, 'rejected' => $rejected];
+
+            $stats[$app] = [
+                            'allowed'   => ($stats[$app]['allowed'] + $allowed), 
+                            'rejected'  => ($stats[$app]['rejected'] + $rejected)
+                        ];
         }
 
         if ($stats) {

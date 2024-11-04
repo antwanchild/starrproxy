@@ -18,13 +18,13 @@ if (!$_SESSION['IN_UI']) {
 require '../loader.php';
 
 if ($_POST['m'] == 'openAppAccessLog') {
-    getLog($_POST['accessApp'], $app);
+    getLog($_POST['appName'], intval($_POST['page']), true);
 }
 
 if ($_POST['m'] == 'viewLog') {
-    getLog($_POST['log']);
+    getLog($_POST['log'], intval($_POST['page']));
 }
 
 if ($_POST['m'] == 'deleteLog') {
-    unlink(APP_LOG_PATH . $_POST['log']);
+    unlink(LOGS_PATH . $_POST['log']);
 }

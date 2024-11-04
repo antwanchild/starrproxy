@@ -1,24 +1,24 @@
-function testStarr(app, instance)
+function testStarr(starrId, app)
 {
-    if (!$('#instance-url-' + instance).val()) {
-        toast('Starr Test', 'The url is required before testing', 'error');
+    if (!$('#instance-url-' + starrId).val()) {
+        toast('Starr test', 'The url is required before testing', 'error');
         return;
     }
 
-    if (!$('#instance-apikey-' + instance).val()) {
-        toast('Starr Test', 'The apikey is required before testing', 'error');
+    if (!$('#instance-apikey-' + starrId).val()) {
+        toast('Starr test', 'The apikey is required before testing', 'error');
         return;
     }
 
-    let apikey = $('#instance-apikey-' + instance).val();
-    if ($('#instance-apikey-' + instance).val().includes('..')) {
-        apikey = $('#instance-apikey-' + instance).data('apikey');
+    let apikey = $('#instance-apikey-' + starrId).val();
+    if ($('#instance-apikey-' + starrId).val().includes('..')) {
+        apikey = $('#instance-apikey-' + starrId).data('apikey');
     }
 
     $.ajax({
         type: 'POST',
         url: 'ajax/starr.php',
-        data: '&m=testStarr&app=' + app + '&url=' + $('#instance-url-' + instance).val() + '&apikey=' + apikey,
+        data: '&m=testStarr&starrId=' + starrId + '&url=' + $('#instance-url-' + starrId).val() + '&apikey=' + apikey + '&app=' + app,
         dataType: 'json',
         success: function (resultData) {
             let type = 'success';
@@ -26,37 +26,47 @@ function testStarr(app, instance)
                 type = 'error';
             }
 
-            toast('Starr Test', resultData.result, type);
+            toast('Starr test', resultData.result, type);
         }
     });
 }
 // -------------------------------------------------------------------------------------------
-function saveStarr(app, instance)
+function saveStarr(starrId, app)
 {
-    const apikey = $('#instance-apikey-' + instance).val();
+    const apikey = $('#instance-apikey-' + starrId).val();
     if (apikey.includes('..')) {
-        $('#instance-apikey-' + instance).val($('#instance-apikey-' + instance).data('apikey'));
+        $('#instance-apikey-' + starrId).val($('#instance-apikey-' + starrId).data('apikey'));
     }
 
     $.ajax({
         type: 'POST',
         url: 'ajax/starr.php',
-        data: '&m=saveStarr&app=' + app + '&instance=' + instance + '&url=' + $('#instance-url-' + instance).val() + '&apikey=' + $('#instance-apikey-' + instance).val() + '&username=' + encodeURIComponent($('#instance-username-' + instance).val()) + '&password=' + encodeURIComponent($('#instance-password-' + instance).val()),
-        success: function () {
-            window.location.href = '?app=' + app;
+        data: '&m=saveStarr&starrId=' + starrId + '&app=' + app + '&url=' + $('#instance-url-' + starrId).val() + '&apikey=' + $('#instance-apikey-' + starrId).val() + '&username=' + encodeURIComponent($('#instance-username-' + starrId).val()) + '&password=' + encodeURIComponent($('#instance-password-' + starrId).val()),
+        success: function (resultData) {
+            if (resultData) {
+                toast('Starr apps', resultData, 'error');
+                return;
+            }
+
+            reload();
         }
     });
 }
 // -------------------------------------------------------------------------------------------
-function deleteStarr(app, instance)
+function deleteStarr(starrId, app)
 {
-    if (confirm('Are you sure you want to delete this ' + app + ' instance?')) {
+    if (confirm('Are you sure you want to delete this instance?')) {
         $.ajax({
             type: 'POST',
             url: 'ajax/starr.php',
-            data: '&m=deleteStarr&app=' + app + '&instance=' + instance,
-            success: function () {
-                window.location.href = '?app=' + app;
+            data: '&m=deleteStarr&starrId=' + starrId + '&app=' + app,
+            success: function (resultData) {
+                if (resultData) {
+                    toast('Starr apps', resultData, 'error');
+                    return;
+                }
+
+                reload();
             }
         });
     }
@@ -67,7 +77,7 @@ function openAppStarrAccess(app, id, clone = '')
     $.ajax({
         type: 'POST',
         url: 'ajax/starr.php',
-        data: '&m=newAppStarrAccess&app=' + app + '&id=' + id + '&clone=' + clone,
+        data: '&m=openAppStarrAccess&app=' + app + '&id=' + id + '&clone=' + clone,
         success: function (resultData) {
             dialogOpen({
                 id: 'openAppStarrAccess',
@@ -88,12 +98,12 @@ function saveAppStarrAccess(app, id)
     if (!$('#access-apikey').val()) {
         error = 'App apikey is required';
     }
-    if (!$('#access-instances').val()) {
-        error = 'App instances is required';
+    if (!$('#access-instance').val()) {
+        error = 'App instance is required';
     }
 
     if (error) {
-        toast('API Access', error, 'error');
+        toast('API access', error, 'error');
         return;
     }
 
@@ -108,9 +118,14 @@ function saveAppStarrAccess(app, id)
     $.ajax({
         type: 'POST',
         url: 'ajax/starr.php',
-        data: '&m=saveAppStarrAccess&app=' + app + '&name=' + $('#access-name').val() + '&apikey=' + $('#access-apikey').val() + '&id=' + id + '&instances=' + $('#access-instances').val() + params,
-        success: function () {
-            window.location.href = '?app=' + app;
+        data: '&m=saveAppStarrAccess&app=' + app + '&name=' + $('#access-name').val() + '&apikey=' + $('#access-apikey').val() + '&id=' + id + '&starr_id=' + $('#access-instance').val() + params,
+        success: function (resultData) {
+            if (resultData) {
+                toast('App access', resultData, 'error');
+                return;
+            }
+
+            reload();
         }
     });
 }
@@ -122,8 +137,13 @@ function deleteAppStarrAccess(app, id)
             type: 'POST',
             url: 'ajax/starr.php',
             data: '&m=deleteAppStarrAccess&app=' + app + '&id=' + id,
-            success: function () {
-                window.location.href = '?app=' + app;
+            success: function (resultData) {
+                if (resultData) {
+                    toast('App access', resultData, 'error');
+                    return;
+                }
+    
+                reload();
             }
         });
     }
@@ -136,8 +156,13 @@ function resetUsage(app, id)
             type: 'POST',
             url: 'ajax/starr.php',
             data: '&m=resetUsage&app=' + app + '&id=' + id,
-            success: function () {
-                window.location.href = '?app=' + app;
+            success: function (resultData) {
+                if (resultData) {
+                    toast('Usage', resultData, 'error');
+                    return;
+                }
+    
+                reload();
             }
         });
     }
@@ -150,6 +175,11 @@ function addEndpointAccess(app, id, endpoint, method, endpointHash)
         url: 'ajax/starr.php',
         data: '&m=addEndpointAccess&app=' + app + '&id=' + id + '&endpoint=' + endpoint + '&method=' + method,
         success: function () {
+            if (resultData) {
+                toast('App access', resultData, 'error');
+                return;
+            }
+
             $('#disallowed-endpoint-' + endpointHash + ', #allowed-endpoint-' + endpointHash).toggle();
             toast('Endpoint access', 'The ' + endpoint + ' endpoint has been allowed for this app', 'success');
         }

@@ -50,17 +50,28 @@ if (!$_SESSION['IN_UI']) {
                 </button>
                 <div class="collapse navbar-collapse" id="navbarColor02">
                     <ul class="navbar-nav">
-                        <?php 
-                        foreach ($starrApps as $index => $starrApp) {
+                        <?php
+                        foreach (StarrApps::LIST as $index => $starrApp) {
                             $active = $app == $starrApp;
+                            $starrAppCount = 0;
+
+                            foreach ($starrsTable as $starrDbApp) {
+                                $rowApp = $starr->getStarrInterfaceNameFromId($starrDbApp['starr']);
+                                if ($rowApp == $starrApp) {
+                                    $starrAppCount++;
+                                }
+                            }
 
                             ?>
                             <li class="nav-item">
-                                <a class="nav-link <?= $active ? 'active' : '' ?>" href="/?app=<?= $starrApp ?>"><img src="images/logos/<?= $starrApp ?>.png" style="height: 18px;"> <span class="me-3"><?= ucfirst($starrApp) ?> - <?= is_array($settingsFile[$starrApp]) ? count($settingsFile[$starrApp]) : 0 ?></span></a>
+                                <a class="nav-link <?= $active ? 'active' : '' ?>" href="/?app=<?= $starrApp ?>"><img src="images/logos/<?= $starrApp ?>.png" style="height: 18px;"> <span class="me-3"><?= ucfirst($starrApp) ?> - <?= $starrAppCount ?></span></a>
                             </li>
                             <?php
                         }
                         ?>
+                        <li class="nav-item">
+                            <a class="nav-link <?= $page == 'notifications' ? 'active' : '' ?>" href="/?page=notifications"><i class="fas fa-comment-dots me-2"></i> <span class="me-3">Notifications</span></a>
+                        </li>
                         <li class="nav-item">
                             <a class="nav-link <?= $page == 'templates' ? 'active' : '' ?>" href="/?page=templates"><i class="far fa-file-alt"></i> <span class="me-3">Templates</span></a>
                         </li>
@@ -68,7 +79,7 @@ if (!$_SESSION['IN_UI']) {
                             <a class="nav-link <?= $page == 'logs' ? 'active' : '' ?>" href="/?page=logs"><i class="fas fa-clipboard-list"></i> <span class="me-3">Logs</span></a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link <?= $page == 'system' ? 'active' : '' ?>" href="/?page=system"><i class="fas fa-cog"></i> <span class="me-3">System</span></a>
+                            <a class="nav-link <?= $page == 'settings' ? 'active' : '' ?>" href="/?page=settings"><i class="fas fa-cog"></i> <span class="me-3">Settings</span></a>
                         </li>
                         <li class="nav-item">
                             <a class="nav-link <?= $page == 'help' ? 'active' : '' ?>" href="/?page=help"><i class="far fa-question-circle"></i> <span class="me-3">Help</span></a>

@@ -18,6 +18,11 @@ function logger($logfile, $apikey = '', $endpoint = '', $proxyCode = 200, $starr
         rename($logfile, str_replace('.log', '_' . date('Ymd') . '.log', $logfile));
     }
 
+    if (str_equals_any($logfile, [MIGRATION_LOG, SYSTEM_LOG])) {
+        file_put_contents($logfile, date('c') . ' ' . $apikey . "\n", FILE_APPEND);
+        return;
+    }
+
     $log = date('c') . ' ua:' . $_SERVER['HTTP_USER_AGENT'];
     if ($apikey) {
         $log .= '; key:' . truncateMiddle($apikey, 20);
@@ -42,8 +47,8 @@ function logger($logfile, $apikey = '', $endpoint = '', $proxyCode = 200, $starr
 
 function getLogs()
 {
-    if (is_dir(APP_LOG_PATH)) {
-        $dir = opendir(APP_LOG_PATH);
+    if (is_dir(LOGS_PATH)) {
+        $dir = opendir(LOGS_PATH);
         while ($log = readdir($dir)) {
             if (!str_contains($log, '.log')) {
                 continue;
@@ -67,21 +72,51 @@ function getLogs()
     return $list;
 }
 
-function getLog($log, $app = false)
+function getLog($appName, $page = 1, $app = false)
 {
-    $logfile    = file_exists(APP_LOG_PATH . 'access_' . $log . '.log') ? APP_LOG_PATH . 'access_' . $log . '.log' : APP_LOG_PATH . $log;
-    $file       = file_get_contents($logfile);
+    global $starr, $shell;
+    $page   = $page <= 1 ? 1 : $page;
+    $start  = $page * LOG_LINES_PER_PAGE;
+    $end    = $start + LOG_LINES_PER_PAGE;
+
+    $starr ??= new Starr();
+    $logfile    = file_exists(LOGS_PATH . 'access_' . $appName . '.log') ? LOGS_PATH . 'access_' . $appName . '.log' : LOGS_PATH . $appName;
+    list($logLines, $file) = explode(' ', $shell->exec('wc -l ' . $logfile));
+    $cmd        = $app ? 'tail -' . LOG_LINES_PER_PAGE . ' ' . $logfile : 'awk -vs="' . $start . '" -ve="' . $end . '" \'NR>=s&&NR<=e\' "' . $logfile . '"';
+    $file       = $shell->exec($cmd);
     $lines      = explode("\n", $file);
+    rsort($lines);
+
+    $pages = floor($logLines / LOG_LINES_PER_PAGE);
 
     ?>
     <ul class="nav nav-tabs" role="tablist">
         <li class="nav-item" role="presentation">
-            <a class="nav-link active" data-bs-toggle="tab" href="#access" aria-selected="true" role="tab">Access log</a>
+            <a class="nav-link active" data-bs-toggle="tab" href="#access" aria-selected="true" role="tab">Access log (<?= number_format($logLines) ?> lines)</a>
         </li>
         <?php if ($app) { ?>
         <li class="nav-item" role="presentation">
             <a class="nav-link" data-bs-toggle="tab" href="#endpoints" aria-selected="false" tabindex="-1" role="tab">Endpoint usage</a>
         </li>
+        <?php } ?>
+        <?php if (!$app && $pages > 1) { ?>
+        <li class="ms-5">
+            <?php if ($page != 1) { ?>
+                <?php if ($pages >= 2) { ?>
+                <button class="btn btn-sm btn-info" onclick="viewLog('<?= $appName ?>', '<?= $_POST['index'] ?>', 1)"><i class="fas fa-fast-backward"></i> Start</button>
+                <?php } ?>
+                <button class="btn btn-sm btn-info" onclick="viewLog('<?= $appName ?>', '<?= $_POST['index'] ?>', <?= $page - 1 ?>)"><i class="fas fa-backward"></i> Back</button>
+            <?php } ?>
+            <?php if ($page != $pages) { ?>
+                <button class="btn btn-sm btn-info" onclick="viewLog('<?= $appName ?>', '<?= $_POST['index'] ?>', <?= $page + 1 ?>)"><i class="fas fa-forward"></i> Next</button>
+                <?php if ($pages >= 2) { ?>
+                <button class="btn btn-sm btn-info" onclick="viewLog('<?= $appName ?>', '<?= $_POST['index'] ?>', <?= $pages ?>)"><i class="fas fa-fast-forward"></i> End</button>
+                <?php } ?>
+            <?php } ?>
+            <span class="ms-3">Page: <?= $page ?>/<?= $pages ?></span>
+        </li>
+        <?php } else { ?>
+            <span class="ms-3">Newest <?= number_format(LOG_LINES_PER_PAGE) ?> lines</span>
         <?php } ?>
     </ul>
     <div id="myTabContent" class="tab-content">
@@ -115,7 +150,7 @@ function getLog($log, $app = false)
         </div>
         <?php 
         if ($app) {
-            $proxiedApp = getAppFromProxiedKey($_POST['key'], true);
+            $proxiedApp = $starr->getAppFromProxiedKey($_POST['key'], true);
             ?>
             <div class="tab-pane fade" id="endpoints" role="tabpanel">
                 <h4>Endpoint usage <span class="text-small">(<?= count($endpointUsage) ?> endpoint<?= count($endpointUsage) == 1 ? '' : 's' ?>)</span></h4>

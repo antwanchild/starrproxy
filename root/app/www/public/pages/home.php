@@ -15,9 +15,9 @@ if (!$_SESSION['IN_UI']) {
     exit('Invalid session, refresh the page');
 }
 
-$getTotalAppStats       = getTotalAppStats($settingsFile);
-$getTotalEndpointStats  = getTotalEndpointStats($settingsFile);
-$getTotalUsageStats     = getTotalUsageStats($settingsFile, $usageFile);
+$getTotalAppStats       = getTotalAppStats($starrsTable);
+$getTotalEndpointStats  = getTotalEndpointStats($starrsTable, $appsTable);
+$getTotalUsageStats     = getTotalUsageStats($starrsTable, $appsTable, $usageTable);
 ?>
 
 <div class="card mb-3">
@@ -49,11 +49,11 @@ $getTotalUsageStats     = getTotalUsageStats($settingsFile, $usageFile);
                             </tr>
                             <?php
                             if ($getTotalAppStats) {
-                                foreach ($getTotalAppStats as $starr => $instances) {
+                                foreach ($getTotalAppStats as $starrApp => $instances) {
                                     ?>
                                     <tr>
-                                        <td><img src="images/logos/<?= $starr ?>.png" style="height:20px;"></td>
-                                        <td><?= ucfirst($starr) ?></td>
+                                        <td><img src="images/logos/<?= $starrApp ?>.png" style="height:20px;"></td>
+                                        <td><?= ucfirst($starrApp) ?></td>
                                         <td><?= $instances ?></td>
                                     </tr>
                                     <?php
@@ -80,11 +80,11 @@ $getTotalUsageStats     = getTotalUsageStats($settingsFile, $usageFile);
                             </tr>
                             <?php
                             if ($getTotalEndpointStats) {
-                                foreach ($getTotalEndpointStats as $starr => $endpointStats) {
+                                foreach ($getTotalEndpointStats as $starrApp => $endpointStats) {
                                     ?>
                                     <tr>
-                                        <td><img src="images/logos/<?= $starr ?>.png" style="height:20px;"></td>
-                                        <td><?= ucfirst($starr) ?></td>
+                                        <td><img src="images/logos/<?= $starrApp ?>.png" style="height:20px;"></td>
+                                        <td><?= ucfirst($starrApp) ?></td>
                                         <td><?= number_format($endpointStats['apps']) ?></td>
                                         <td><?= number_format($endpointStats['allowed']) ?></td>
                                         <td><?= number_format($endpointStats['total'] - $endpointStats['allowed']) ?></td>
@@ -107,17 +107,17 @@ $getTotalUsageStats     = getTotalUsageStats($settingsFile, $usageFile);
                             <tr>
                                 <td></td>
                                 <td>Starr</td>
-                                <td>Approved</td>
+                                <td>Allowed</td>
                                 <td>Rejected</td>
                             </tr>
                             <?php
                             if ($getTotalUsageStats) {
-                                foreach ($getTotalUsageStats as $starr => $usageStats) {
+                                foreach ($getTotalUsageStats as $starrApp => $usageStats) {
                                     ?>
                                     <tr>
-                                        <td><img src="images/logos/<?= $starr ?>.png" style="height:20px;"></td>
-                                        <td><?= ucfirst($starr) ?></td>
-                                        <td><?= number_format($usageStats['success']) ?></td>
+                                        <td><img src="images/logos/<?= $starrApp ?>.png" style="height:20px;"></td>
+                                        <td><?= ucfirst($starrApp) ?></td>
+                                        <td><?= number_format($usageStats['allowed']) ?></td>
                                         <td><?= number_format($usageStats['rejected']) ?></td>
                                     </tr>
                                     <?php

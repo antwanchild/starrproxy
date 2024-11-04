@@ -7,10 +7,6 @@
 ----------------------------------
 */
 
-if (!$_SESSION) {
-    session_start();
-}
-
 if (!$_SESSION['IN_UI']) {
     exit('Invalid session, refresh the page');
 }
@@ -31,25 +27,28 @@ if (!$_SESSION['IN_UI']) {
                 </tr>
             </thead>
             <tbody>
-                <?php 
-                if ($settingsFile[$app]) {
-                    foreach ($settingsFile[$app] as $instance => $instanceSettings) {
+                <?php
+                if ($starrsTable) {
+                    foreach ($starrsTable as $starrInstance) {
+                        if ($starrInstance['starr'] != $starr->getStarrInterfaceIdFromName($app)) {
+                            continue;
+                        }
                         ?>
                         <tr>
-                            <td><?= $instanceSettings['name'] ?></td>
-                            <td><input type="text" class="form-control" id="instance-url-<?= $instance ?>" placeholder="http://localhost:1111" value="<?= $instanceSettings['url'] ?>"></td>
+                            <td><?= $starrInstance['name'] ?></td>
+                            <td><input type="text" class="form-control" id="instance-url-<?= $starrInstance['id'] ?>" placeholder="http://localhost:1111" value="<?= $starrInstance['url'] ?>"></td>
                             <td>
                                 <div class="input-group mb-3">
-                                    <input type="text" class="form-control" id="instance-apikey-<?= $instance ?>" data-apikey="<?= $instanceSettings['apikey'] ?>" placeholder="12345-67890-09876-54321" value="<?= truncateMiddle($instanceSettings['apikey'], 20) ?>" aria-describedby="apikey-<?= $instance ?>">
-                                    <button class="btn btn-primary" type="button" id="apikey-<?= $instance ?>" onclick="$('#instance-apikey-<?= $instance ?>').val($('#instance-apikey-<?= $instance ?>').data('apikey'))">Show</button>
+                                    <input type="text" class="form-control" id="instance-apikey-<?= $starrInstance['id'] ?>" data-apikey="<?= $starrInstance['apikey'] ?>" placeholder="12345-67890-09876-54321" value="<?= truncateMiddle($starrInstance['apikey'], 20) ?>" aria-describedby="apikey-<?= $starrInstance['id'] ?>">
+                                    <button class="btn btn-primary" type="button" id="apikey-<?= $starrInstance['id'] ?>" onclick="$('#instance-apikey-<?= $starrInstance['id'] ?>').val($('#instance-apikey-<?= $starrInstance['id'] ?>').data('apikey'))">Show</button>
                                 </div>
                             </td>
-                            <td><input type="text" class="form-control" id="instance-username-<?= $instance ?>" placeholder="username" value="<?= $instanceSettings['username'] ?>"></td>
-                            <td><input type="password" class="form-control" id="instance-password-<?= $instance ?>" placeholder="password" value="<?= $instanceSettings['password'] ?>"></td>
+                            <td><input type="text" class="form-control" id="instance-username-<?= $starrInstance['id'] ?>" placeholder="username" value="<?= $starrInstance['username'] ?>"></td>
+                            <td><input type="password" class="form-control" id="instance-password-<?= $starrInstance['id'] ?>" placeholder="password" value="<?= $starrInstance['password'] ?>"></td>
                             <td align="center">
-                                <button class="btn btn-outline-info" type="button" onclick="testStarr('<?= $app ?>', '<?= $instance ?>')"><i class="fas fa-network-wired"></i> Test API</button>
-                                <button class="btn btn-outline-success" type="button" onclick="saveStarr('<?= $app ?>', '<?= $instance ?>')"><i class="fas fa-save"></i> Save</button>
-                                <button class="btn btn-outline-danger" type="button" onclick="deleteStarr('<?= $app ?>', '<?= $instance ?>')"><i class="fas fa-trash-alt"></i> Delete</button>
+                                <button class="btn btn-outline-info" type="button" onclick="testStarr('<?= $starrInstance['id'] ?>', '<?= $app ?>')"><i class="fas fa-network-wired"></i> Test API</button>
+                                <button class="btn btn-outline-success" type="button" onclick="saveStarr('<?= $starrInstance['id'] ?>', '<?= $app ?>')"><i class="fas fa-save"></i> Save</button>
+                                <button class="btn btn-outline-danger" type="button" onclick="deleteStarr('<?= $starrInstance['id'] ?>', '<?= $app ?>')"><i class="fas fa-trash-alt"></i> Delete</button>
                             </td>
                         </tr>
                         <?php
@@ -63,8 +62,8 @@ if (!$_SESSION['IN_UI']) {
                     <td><input type="text" class="form-control" id="instance-username-99" placeholder="username"></td>
                     <td><input type="text" class="form-control" id="instance-password-99" placeholder="password"></td>
                     <td align="center">
-                        <button class="btn btn-outline-info" type="button" onclick="testStarr('<?= $app ?>', '99')"><i class="fas fa-network-wired"></i> Test API</button>
-                        <button class="btn btn-outline-success" type="button" onclick="saveStarr('<?= $app ?>', '99')"><i class="fas fa-plus-circle"></i> Add</button>
+                        <button class="btn btn-outline-info" type="button" onclick="testStarr('99', '<?= $app ?>')"><i class="fas fa-network-wired"></i> Test API</button>
+                        <button class="btn btn-outline-success" type="button" onclick="saveStarr('99', '<?= $app ?>')"><i class="fas fa-plus-circle"></i> Add</button>
                     </td>
                 </tr>
             </tbody>
@@ -76,25 +75,22 @@ if (!$_SESSION['IN_UI']) {
     <br>You will use <code id="proxyUrl"><?= APP_URL ?></code> <i class="far fa-copy text-info" style="cursor: pointer;" onclick="clipboard('proxyUrl', 'html')" title="Copy apikey to clipboard"></i> as the <?= ucfirst($app) ?> url in the 3<sup>rd</sup> party app and copy the apikey below<br><br>
     <div class="row">
         <?php
-        if ($settingsFile['access'] && $settingsFile['access'][$app]) {
-            $unsortedAccessApps = [];
-            foreach ($settingsFile['access'][$app] as $accessIndex => $accessApp) {
-                $accessApp['id'] = $accessIndex;
-                $unsortedAccessApps[$accessApp['name']][] = $accessApp;
-            }
-            ksort($unsortedAccessApps);
+        if ($appsTable) {
+            foreach ($appsTable as $accessApp) {
+                $template = '';
+                $parentStarrApp = $proxyDb->getStarrAppFromId($accessApp['starr_id'], $starrsTable);
 
-            $sortedAccessApps = [];
-            foreach ($unsortedAccessApps as $unsortedAccessAppList) {
-                foreach ($unsortedAccessAppList as $unsortedAccessApp) {
-                    $sortedAccessApps[$unsortedAccessApp['id']] = $unsortedAccessApp;
+                if ($app != $starr->getStarrInterfaceNameFromId($parentStarrApp['starr'])) {
+                    continue;
                 }
-            }
 
-            foreach ($sortedAccessApps as $accessIndex => $accessApp) {
-                $accessApp['endpoints'] = makeArray($accessApp['endpoints']);
-                $usageSuccess = intval($usageFile[$app][$accessIndex]['success']);
-                $usageFailure = intval($usageFile[$app][$accessIndex]['error']);
+                $accessApp['endpoints'] = json_decode($accessApp['endpoints'], true) ?: [];
+                $usage = $usageDb->getStarrAppUsage($accessApp['id']);
+
+                if (file_exists('templates/' . $app . '/' . strtolower($accessApp['name']) . '.json')) {
+                    $templateEndpoints = getFile('templates/' . $app . '/' . strtolower($accessApp['name']) . '.json');
+                    $template = ', Template: ' . count($templateEndpoints) . ' endpoint' . (count($templateEndpoints) == 1 ? '' : 's');
+                }
                 ?>
                 <div class="col-sm-12 col-lg-3">
                     <div class="card border-secondary mb-3">
@@ -109,13 +105,13 @@ if (!$_SESSION['IN_UI']) {
                                             <a class="nav-link" data-bs-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false"><i class="fas fa-ellipsis-h text-info"></i></a>
                                             <div class="dropdown-menu">
                                                 <div class="ms-2">
-                                                    <span style="cursor: pointer;" onclick="openAppStarrAccess('<?= $app ?>', <?= $accessIndex ?>)" title="Modify the <?= $accessApp['name'] ?> app's details"><i class="far fa-edit"></i> Modify</span><br>
-                                                    <span style="cursor: pointer;" onclick="openAppAccessLog('<?= $app ?>', <?= $accessIndex ?>, '<?= $accessApp['name'] ?>', '<?= truncateMiddle($accessApp['apikey'], 20) ?>')" title="View <?= $accessApp['name'] ?> app logs"><i class="fas fa-newspaper"></i> Logs</span><br>
-                                                    <span style="cursor: pointer;" onclick="openAppStarrAccess('<?= $app ?>', 99, <?= $accessIndex ?>)" title="Clone the <?= $accessApp['name'] ?> app"><i class="far fa-clone"></i> Clone</span><br>
-                                                    <span style="cursor: pointer;" onclick="openTemplateStarrAccess('<?= $app ?>', <?= $accessIndex ?>)" title="Create a new template based on <?= $accessApp['name'] ?>'s settings"><i class="far fa-file-alt"></i> Create template</span><br>
+                                                    <span style="cursor: pointer;" onclick="openAppStarrAccess('<?= $app ?>', <?= $accessApp['id'] ?>)" title="Modify the <?= $accessApp['name'] ?> app's details"><i class="far fa-edit"></i> Modify</span><br>
+                                                    <span style="cursor: pointer;" onclick="openAppAccessLog('<?= $app ?>', <?= $accessApp['id'] ?>, '<?= $accessApp['name'] ?>', '<?= truncateMiddle($accessApp['apikey'], 20) ?>')" title="View <?= $accessApp['name'] ?> app logs"><i class="fas fa-newspaper"></i> Logs</span><br>
+                                                    <span style="cursor: pointer;" onclick="openAppStarrAccess('<?= $app ?>', 99, <?= $accessApp['id'] ?>)" title="Clone the <?= $accessApp['name'] ?> app"><i class="far fa-clone"></i> Clone</span><br>
+                                                    <span style="cursor: pointer;" onclick="openTemplateStarrAccess('<?= $app ?>', <?= $accessApp['id'] ?>)" title="Create a new template based on <?= $accessApp['name'] ?>'s settings"><i class="far fa-file-alt"></i> Create template</span><br>
                                                     <div class="dropdown-divider"></div>
-                                                    <span style="cursor: pointer;" onclick="resetUsage('<?= $app ?>', <?= $accessIndex ?>)" title="Reset usage counter"><i class="fas fa-recycle text-danger"></i> Reset usage</span><br>
-                                                    <span style="cursor: pointer;" onclick="deleteAppStarrAccess('<?= $app ?>', <?= $accessIndex ?>)" title="Remove the <?= $accessApp['name'] ?> app's access"><i class="far fa-trash-alt text-danger"></i> Delete</span>
+                                                    <span style="cursor: pointer;" onclick="resetUsage('<?= $app ?>', <?= $accessApp['id'] ?>)" title="Reset usage counter"><i class="fas fa-recycle text-danger"></i> Reset usage</span><br>
+                                                    <span style="cursor: pointer;" onclick="deleteAppStarrAccess('<?= $app ?>', <?= $accessApp['id'] ?>)" title="Remove the <?= $accessApp['name'] ?> app's access"><i class="far fa-trash-alt text-danger"></i> Delete</span>
                                                 </div>
                                             </div>
                                         </li>
@@ -124,10 +120,10 @@ if (!$_SESSION['IN_UI']) {
                             </div>
                         </div>
                         <div class="card-body">
-                            Instance: <?= $settingsFile[$app][$accessApp['instances']]['name'] ?: '!! Orphaned !!' ?> <span class="text-small"><?= $settingsFile[$app][$accessApp['instances']]['url'] ? '(' . $settingsFile[$app][$accessApp['instances']]['url'] . ')' : '' ?></span><br>
-                            Access: <?= count($accessApp['endpoints']) ?> endpoint<?= count($accessApp['endpoints']) == 1 ? '' : 's' ?><br>
-                            Apikey: <?= truncateMiddle($accessApp['apikey'], 20) ?> <i class="far fa-copy text-info" style="cursor: pointer;" onclick="clipboard('app-<?= $accessIndex ?>-apikey', 'html')" title="Copy apikey to clipboard"></i><span id="app-<?= $accessIndex ?>-apikey" style="display: none;"><?= $accessApp['apikey'] ?></span><br>
-                            Usage: <?= number_format($usageSuccess + $usageFailure) ?> request<?= $usageSuccess + $usageFailure == 1 ? '' : 's' ?> (Allowed: <?= number_format($usageSuccess) ?> Rejected: <?= number_format($usageFailure) ?>)
+                            Instance: <?= $parentStarrApp['name'] ?> <span class="text-small"><?= $parentStarrApp['url'] ?></span><br>
+                            Access: <?= count($accessApp['endpoints']) ?> endpoint<?= count($accessApp['endpoints']) == 1 ? '' : 's' ?><?= $template ?><br>
+                            Apikey: <?= truncateMiddle($accessApp['apikey'], 20) ?> <i class="far fa-copy text-info" style="cursor: pointer;" onclick="clipboard('app-<?= $accessApp['id'] ?>-apikey', 'html')" title="Copy apikey to clipboard"></i><span id="app-<?= $accessApp['id'] ?>-apikey" style="display: none;"><?= $accessApp['apikey'] ?></span><br>
+                            Usage: <?= number_format($usage['allowed'] + $usage['rejected']) ?> request<?= $usage['allowed'] + $usage['rejected'] == 1 ? '' : 's' ?> (Allowed: <?= number_format($usage['allowed']) ?> Rejected: <?= number_format($usage['rejected']) ?>)
                         </div>
                     </div>
                 </div>

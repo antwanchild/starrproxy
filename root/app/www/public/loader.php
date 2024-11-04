@@ -27,7 +27,7 @@ $app        = $_GET['app'] ?: $_POST['app'];
 $appLabel   = ucfirst($app);
 
 //-- DIRECTORIES TO LOAD FILES FROM, ORDER IS IMPORTANT
-$autoloads          = ['includes', 'functions', 'functions/helpers','classes'];
+$autoloads          = ['includes', 'functions', 'functions/helpers', 'classes'];
 $ignoreAutoloads    = ['header.php', 'footer.php'];
 
 foreach ($autoloads as $autoload) {
@@ -44,21 +44,21 @@ foreach ($autoloads as $autoload) {
     }
 }
 
+//-- INITIALIZE THE SHELL CLASS
+$shell = new Shell();
+
+//-- INITIALIZE THE STARR CLASS
+$starr = new Starr();
+
 //-- CREATE NEEDED FOLDERS
-$createFolders = [APP_LOG_PATH, APP_BACKUP_PATH, APP_USER_TEMPLATES_PATH];
-foreach ($createFolders as $createFolder) {
-    if (!is_dir($createFolder)) {
-        shell_exec('mkdir -p ' . $createFolder);
-    }
+automation();
+
+//-- INITIALIZE THE DATABASE CLASS
+$proxyDb = new Database(PROXY_DATABASE_NAME);
+if ($_SESSION['IN_UI']) {
+    $proxyDb->migrations();
 }
-foreach ($starrApps as $starrApp) {
-    if (!is_dir(APP_USER_TEMPLATES_PATH . $starrApp)) {
-        shell_exec('mkdir -p ' . APP_USER_TEMPLATES_PATH . $starrApp);
-    }
-    if (!is_dir(ABSOLUTE_PATH . 'templates/' . $starrApp)) {
-        shell_exec('mkdir -p ' . ABSOLUTE_PATH . 'templates/' . $starrApp);
-    }
-}
+$usageDb = new Database(USAGE_DATABASE_NAME);
 
 //-- CREATE APIKEY IF MISSING
 if (!file_exists(APP_APIKEY_FILE)) {
@@ -67,6 +67,13 @@ if (!file_exists(APP_APIKEY_FILE)) {
 }
 define('APP_APIKEY', file_get_contents(APP_APIKEY_FILE));
 
-//-- LOAD THE FILES
-$settingsFile   = getFile(APP_SETTINGS_FILE);
-$usageFile      = getFile(APP_USAGE_FILE);
+//-- LOAD THE TABLES
+$starrsTable    = $proxyDb->getStarrsTable();
+$appsTable      = $proxyDb->getAppsTable();
+$usageTable     = $usageDb->getUsageTable();
+
+//-- SOMETIMES THE TABLE IS BUSY, RETRY
+if (!$usageTable && ($app || !$page || $page == 'home')) {
+    sleep(1);
+    $usageTable = $usageDb->getUsageTable();
+}

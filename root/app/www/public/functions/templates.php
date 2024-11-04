@@ -9,8 +9,6 @@
 
 function getTemplateOptions()
 {
-    global $starrApps;
-
     $templateList = getTemplateList();
 
     $templateOptions = '';
@@ -29,11 +27,9 @@ function getTemplateOptions()
 
 function getTemplateList()
 {
-    global $starrApps;
-
     $templateLocations = [ABSOLUTE_PATH . 'templates/', APP_USER_TEMPLATES_PATH];
     $list = [];
-    foreach ($starrApps as $starrApp) {
+    foreach (StarrApps::LIST as $starrApp) {
         foreach ($templateLocations as $templateLocation) {
             if (is_dir($templateLocation . $starrApp)) {
                 $dir = opendir($templateLocation . $starrApp);

@@ -7,6 +7,8 @@
 ----------------------------------
 */
 
+error_reporting(E_ERROR | E_PARSE);
+
 if (!$_SESSION) {
     session_start();
 }
@@ -18,36 +20,27 @@ require ABSOLUTE_PATH . 'includes/header.php';
 
 ?>
 <div class="row w-100 m-5">
-    <?php 
-    if (in_array($app, $starrApps)) {
-        ?>
-        <ol class="breadcrumb">
-            <li class="breadcrumb-item"><a href="?page=home">Home</a></li>
-            <li class="breadcrumb-item active"><?= ucfirst($app) ?></li>
-        </ol>
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item <?= !$page || $page == 'home' ? 'active' : '' ?>"><?= $page != 'home' ? '<a href="?page=home">Home</a>' : 'Home' ?></li>
         <?php
-        require ABSOLUTE_PATH . 'pages/starr.php';
-    } elseif ($page) {
+        switch (true) {
+            case in_array($app, StarrApps::LIST):
+                $requiredPage = 'starr';
+                ?><li class="breadcrumb-item active"><?= ucfirst($app) ?></li><?php
+                break;
+            case $page:
+                $requiredPage = $page;
+                if ($page != 'home')  { 
+                    ?><li class="breadcrumb-item active"><?= ucfirst($page) ?></li><?php 
+                }
+                break;
+            default:
+                $requiredPage = 'home';
+                break;
+        }
         ?>
-        <ol class="breadcrumb">
-            <?php if ($page != 'home') { ?>
-            <li class="breadcrumb-item"><a href="?page=home">Home</a></li>
-            <li class="breadcrumb-item active"><?= ucfirst($page) ?></li>
-            <?php } else { ?>
-            <li class="breadcrumb-item active">Home</li>
-            <?php } ?>
-        </ol>
-        <?php
-        require ABSOLUTE_PATH . 'pages/' . $page . '.php';
-    } else {
-        ?>
-        <ol class="breadcrumb">
-            <li class="breadcrumb-item active">Home</li>
-        </ol>
-        <?php
-        require ABSOLUTE_PATH . 'pages/home.php';
-    }
-    ?>
+    </ol>
+    <?php require ABSOLUTE_PATH . 'pages/' . $requiredPage . '.php'; ?>
 </div>
 <?php
 

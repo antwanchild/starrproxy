@@ -21,7 +21,7 @@ if (!defined('ABSOLUTE_PATH')) {
 
 require ABSOLUTE_PATH . 'loader.php';
 
-$logfile = APP_LOG_PATH . 'access.log';
+$logfile = LOGS_PATH . 'access.log';
 
 $internalEndpoint = false;
 $_GET['endpoint'] = strtolower($_GET['endpoint']);
@@ -60,9 +60,9 @@ if ($internalEndpoint) {
                 if (!$request['name']) {
                     $requestError = 'name field is required, should be the name of the 3rd party app/script';
                 } elseif (!$request['starr']) {
-                    $requestError = 'starr field is required, should be one of: ' . implode(', ', $starrApps);
-                } elseif (!in_array($request['starr'], $starrApps)) {
-                    $requestError = 'starr field is not valid, should be one of: ' . implode(', ', $starrApps);
+                    $requestError = 'starr field is required, should be one of: ' . implode(', ', StarrApps::LIST);
+                } elseif (!in_array($request['starr'], StarrApps::LIST)) {
+                    $requestError = 'starr field is not valid, should be one of: ' . implode(', ', StarrApps::LIST);
                 } elseif (!$request['url']) {
                     $requestError = 'url field is required, should be the local url to the starr app';
                 } elseif (!$request['apikey']) {
@@ -84,7 +84,7 @@ if ($internalEndpoint) {
 
                     $request['url'] = rtrim($request['url'], '/');
 
-                    $test = testStarrConnection($request['starr'], $request['url'], $request['apikey']);
+                    $test = $starr->testConnection($request['starr'], $request['url'], $request['apikey']);
 
                     $error = $result = '';
                     if ($test['code'] != 200) {
@@ -92,24 +92,40 @@ if ($internalEndpoint) {
                         $response   = ['error' => sprintf(APP_API_ERROR, 'could not connect to the starr app (' . $request['starr'] . ')')];
                     } else {
                         //-- ADD THE STARR APP
-                        $settingsFile[$request['starr']][] = ['name' => $test['response']['instanceName'], 'url' => $request['url'], 'apikey' => $request['apikey']];
-                        setFile(APP_SETTINGS_FILE, $settingsFile);
-                        $settingsFile = getFile(APP_SETTINGS_FILE); //-- RELOAD IT AFTER ADDING THE STARR APP
+                        $fields = [
+                                    'name'      => $test['response']['instanceName'], 
+                                    'url'       => $request['url'], 
+                                    'apikey'    => $request['apikey'], 
+                                    'username'  => rawurldecode($request['username']), 
+                                    'password'  => rawurldecode($request['password'])
+                                ];
+            
+                        $error = $proxyDb->addStarrApp($request['starr'], $fields);
 
                         //-- ADD THE APP ACCESS
-                        $starrApp = getAppFromStarrKey($request['apikey']);
+                        $starrApp = $starr->getAppFromStarrKey($request['apikey'], $starrsTable);
 
-                        if ($starrApp['id']) {
+                        if (!$error) {
                             $scopeKey       = generateApikey();
                             $scopeAccess    = $request['template'] ? json_decode(file_get_contents('../templates/' . $request['starr'] . '/' . $request['template'] . '.json'), true) : [];
 
-                            $settingsFile['access'][$request['starr']][] = ['name' => $request['name'], 'apikey' => $scopeKey, 'instances' => $starrApp['id'], 'endpoints' => $scopeAccess];
-                            setFile(APP_SETTINGS_FILE, $settingsFile);
+                            $fields = [
+                                        'name'      => $request['name'], 
+                                        'apikey'    => $scopeKey, 
+                                        'starr_id'  => $starrApp['id'],
+                                        'endpoints' => $scopeAccess
+                                    ];
+                            $error = $proxyDb->addApp($fields);
 
-                            $code                       = 200;
-                            $response['proxied-scope']  = $request['template'] ? $request['template'] . '\'s template access (' . count($scopeAccess) . ' endpoint' . (count($scopeAccess) != 1 ? 's' : '') . ')' : 'no access';
-                            $response['proxied-url']    = APP_URL;
-                            $response['proxied-key']    = $scopeKey;
+                            if (!$error) {
+                                $code                       = 200;
+                                $response['proxied-scope']  = $request['template'] ? $request['template'] . '\'s template access (' . count($scopeAccess) . ' endpoint' . (count($scopeAccess) != 1 ? 's' : '') . ')' : 'no access';
+                                $response['proxied-url']    = APP_URL;
+                                $response['proxied-key']    = $scopeKey;
+                            } else {
+                                $code       = 400;
+                                $response   = ['error' => sprintf(APP_API_ERROR, 'failed to add proxied app')];                                
+                            }
                         } else {
                             $code       = 400;
                             $response   = ['error' => sprintf(APP_API_ERROR, 'failed to add starr app')];
@@ -126,14 +142,15 @@ if ($internalEndpoint) {
 
     apiResponse($code, $response);
 } else {
-    $proxiedApp = getAppFromProxiedKey($apikey);
+    $proxiedApp = $starr->getAppFromProxiedKey($apikey);
+
     if (!$proxiedApp) {
         logger($logfile, $apikey, $endpoint, 401);
         apiResponse(401, ['error' => sprintf(APP_API_ERROR, 'provided apikey is not valid or has no access')]);
     }
 
     if (!$endpoint && $_GET['backup']) { //--- Notifiarr corruption checking
-        $proxyBackup = downloadStarrBackup($_GET['backup'], $proxiedApp['app']);
+        $proxyBackup = $starr->downloadBackup($_GET['backup'], $proxiedApp['starrAppDetails']);
 
         if ($proxyBackup) {
             header('Content-Type: application/octet-stream');
@@ -142,9 +159,6 @@ if ($internalEndpoint) {
             readfile($proxyBackup);
         }
     } else {
-        $app    = $proxiedApp['starr'];
-        $appId  = $proxiedApp['appId'];
-
         // CHECK IF THE ENDPOINT HAS WILDCARDS: /{...}/{...} OR /{...}
         if (!$proxiedApp['access'][$endpoint]) {
             $endpointRegexes    = ['/(.*)\/(.*)\/(.*)/', '/(.*)\/(.*)/'];
@@ -181,27 +195,27 @@ if ($internalEndpoint) {
 
             if (!$wildcard) {
                 logger($logfile, $apikey, $endpoint, 401);
-                logger(str_replace('access.log', 'access_' . $settingsFile['access'][$app][$appId]['name'] . '.log', $logfile), $apikey, $endpoint, 401);
-                accessCounter($app, $appId, 401);
+                logger(str_replace('access.log', 'access_' . $proxiedApp['proxiedAppDetails']['name'] . '.log', $logfile), $apikey, $endpoint, 401);
+                $usageDb->adjustAppUsage($proxiedApp['proxiedAppDetails']['id'], 401);
                 apiResponse(401, ['error' => sprintf(APP_API_ERROR, 'provided apikey is missing access to ' . $endpoint)]);
             }
         }
 
         if (!in_array($method, $proxiedApp['access'][$endpoint])) {
             logger($logfile, $apikey, $endpoint, 405);
-            logger(str_replace('access.log', 'access_' . $settingsFile['access'][$app][$appId]['name'] . '.log', $logfile), $apikey, $endpoint, 405);
-            accessCounter($app, $appId, 405);
+            logger(str_replace('access.log', 'access_' . $proxiedApp['proxiedAppDetails']['name'] . '.log', $logfile), $apikey, $endpoint, 405);
+            $usageDb->adjustAppUsage($proxiedApp['proxiedAppDetails']['id'], 405);
             apiResponse(405, ['error' => sprintf(APP_API_ERROR, 'provided apikey is missing access to ' . $endpoint . ' using the ' . $method . ' method')]);
         }
 
-        $starrUrl   = $proxiedApp['app']['url'] . $originalEndpoint . ($variables ? '?' . http_build_query($variables) : '');
-        $request    = curl($starrUrl, ['X-Api-Key:' . $proxiedApp['app']['apikey']], $method, $json);
+        $starrUrl   = $proxiedApp['starrAppDetails']['url'] . $originalEndpoint . ($variables ? '?' . http_build_query($variables) : '');
+        $request    = curl($starrUrl, ['X-Api-Key:' . $proxiedApp['starrAppDetails']['apikey']], $method, $json);
 
         logger($logfile, $apikey, $endpoint, 200, $request['code']);
-        logger(str_replace('access.log', 'access_' . $settingsFile['access'][$app][$appId]['name'] . '.log', $logfile), $apikey, $originalEndpoint, 200, $request['code'], $request);
-        accessCounter($app, $appId, $request['code']);
+        logger(str_replace('access.log', 'access_' . $proxiedApp['proxiedAppDetails']['name'] . '.log', $logfile), $apikey, $originalEndpoint, 200, $request['code'], $request);
+        $usageDb->adjustAppUsage($proxiedApp['proxiedAppDetails']['id'], $request['code']);
 
-        if (str_contains($endpoint, 'mediacover')) { //-- OUTPUT THE REQUESTED IMAGE
+        if ($request['code'] <= 299 && str_contains($endpoint, 'mediacover')) { //-- OUTPUT THE REQUESTED IMAGE
             foreach ($request['responseHeaders'] as $rhKey => $rhVal) {
                 header($rhKey . ': ' . $rhVal[0]);
             }
