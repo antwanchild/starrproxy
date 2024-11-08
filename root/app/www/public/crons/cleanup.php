@@ -41,6 +41,24 @@ if (is_dir(LOGS_PATH)) {
     closedir($dir);
 }
 
+$systemFolder = str_replace(basename(SYSTEM_LOG), '', SYSTEM_LOG);
+if (is_dir($systemFolder)) {
+    $dir = opendir($systemFolder);
+    while ($file = readdir($dir)) {
+        $logfile = $systemFolder . $file;
+
+        if (!str_contains($logfile, '.log')) {
+            continue;
+        }
+
+        if (filemtime($logfile) <= (time() - (86400 * LOG_AGE))) {
+            echo date('c') . ' removing old logfile \'' . $logfile . '\''."\n";
+            $shell->exec('rm ' . $logfile);
+        }
+    }
+    closedir($dir);
+}
+
 //-- OLD BACKUPS
 if (is_dir(BACKUP_PATH)) {
     $dir = opendir(BACKUP_PATH);

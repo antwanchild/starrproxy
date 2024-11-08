@@ -27,12 +27,14 @@ class Database
     public $notificationTriggersTable;
     public $notificationLinkTable;
     public $starr;
+    public $shell;
 
     public function __construct($dbName)
     {
         $this->connect(DATABASE_PATH . $dbName);
         $this->dbName = $dbName;
         $this->starr = new Starr();
+        $this->shell = new Shell();
     }
 
     public function connect($dbFile)
@@ -88,7 +90,11 @@ class Database
 
     public function backup()
     {
-        $this->db->query("VACUUM INTO '" . BACKUP_PATH . date('Ymd') . '/' . $this->dbName . "'");
+        $this->db->query("VACUUM INTO '" . BACKUP_PATH . date('Y-m-d') . '/' . $this->dbName . "'");
+
+        if ($this->error() != 'not an error') {
+            return $this->error();
+        }
     }
 
     public function getNewestMigration()

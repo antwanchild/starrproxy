@@ -19,7 +19,7 @@ $logList = getLogs();
 ?>
 
 <div class="row p3">
-    <div class="col-sm-2">
+    <div class="col-sm-3">
         <?php
         $index = 0;
         ?><h4 class="mt-2 fst-italic">system</h4><?php
@@ -30,6 +30,7 @@ $logList = getLogs();
                 <li>
                     <i class="far fa-trash-alt text-danger" title="Delete access log" style="cursor:pointer;" onclick=""></i> 
                     <span id="app-log-<?= $index ?>" style="cursor:pointer;" onclick="viewLog('<?= $log ?>', <?= $index ?>)"><?= $log ?></span>
+                    <div style="float: right;"><?= byteConversion(filesize(LOGS_PATH . $log)) ?></div>
                 </li>
             </ul>
             <?php
@@ -48,6 +49,7 @@ $logList = getLogs();
                     <li>
                         <i class="far fa-trash-alt text-danger" title="Delete access log" style="cursor:pointer;" onclick="deleteLog('<?= $log ?>')"></i> 
                         <span id="app-log-<?= $index ?>" style="cursor:pointer;" onclick="viewLog('<?= $log ?>', <?= $index ?>)"><?= str_replace('access_', '', $log) ?></span>
+                        <div style="float: right;"><?= byteConversion(filesize(LOGS_PATH . $log)) ?></div>
                     </li>
                 </ul>
                 <?php
@@ -55,7 +57,7 @@ $logList = getLogs();
         }
         ?>
     </div>
-    <div class="col-sm-10">
+    <div class="col-sm-9">
         <div id="log-viewer" class="mt-3"></div>
     </div>
 </div>

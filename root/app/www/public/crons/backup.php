@@ -25,6 +25,14 @@ require ABSOLUTE_PATH . 'loader.php';
 
 $backupFolder = BACKUP_PATH . date('Y-m-d') . '/';
 $shell->exec('mkdir -p ' . $backupFolder);
-$proxyDb->backup();
-$usageDb->backup();
+
+$proxyBackupError = $proxyDb->backup();
+if ($proxyBackupError) {
+    echo date('c') . '[ERROR] Backup of main database failed: ' . $proxyBackupError . "\n";
+}
+$usageBackupError = $usageDb->backup();
+if ($usageBackupError) {
+    echo date('c') . '[ERROR] Backup of usage database failed: ' . $usageBackupError . "\n";
+}
+
 copy(APP_APIKEY_FILE, $backupFolder . basename(APP_APIKEY_FILE));
