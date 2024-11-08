@@ -76,7 +76,7 @@ function getLog($appName, $page = 1, $app = false)
 {
     global $starr, $shell;
     $page   = $page <= 1 ? 1 : $page;
-    $start  = $page * LOG_LINES_PER_PAGE;
+    $start  = $page == 1 ?  0 : $page * LOG_LINES_PER_PAGE;
     $end    = $start + LOG_LINES_PER_PAGE;
 
     $starr ??= new Starr();
@@ -116,7 +116,7 @@ function getLog($appName, $page = 1, $app = false)
             <span class="ms-3">Page: <?= $page ?>/<?= $pages ?></span>
         </li>
         <?php } else { ?>
-            <span class="ms-3">Newest <?= number_format(LOG_LINES_PER_PAGE) ?> lines</span>
+            <span class="ms-3">Newest <?= LOG_LINES_PER_PAGE ?> filtered lines</span>
         <?php } ?>
     </ul>
     <div id="myTabContent" class="tab-content">
@@ -134,6 +134,8 @@ function getLog($appName, $page = 1, $app = false)
                         if (!str_contains($line, 'key:' . $_POST['key'])) {
                             continue;
                         }
+
+                        $line = str_replace('key:' . $_POST['key'] . ';', '<span class="text-warning">key:' . $_POST['key'] . ';</span>', $line);
 
                         preg_match('/endpoint:(.*);/U', $line, $endpointMatch);
                         preg_match('/method:(.*);/U', $line, $methodMatch);
