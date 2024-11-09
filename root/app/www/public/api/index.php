@@ -35,7 +35,7 @@ list($endpoint, $parameters) = explode('?', $_GET['endpoint']);
 $originalEndpoint   = $endpoint;
 $method             = strtolower($_SERVER['REQUEST_METHOD']);
 $json               = file_get_contents('php://input');
-$internalEndpoint   = str_equals_any($endpoint, ['/api/addstarr']) ? true : false;
+$internalEndpoint   = str_equals_any($endpoint, ['/api/addstarr', '/api/proxystats']) ? true : false;
 $apikey             = $_GET['apikey'] ?: $_SERVER['HTTP_X_API_KEY'];
 
 if (!$apikey) {
@@ -49,6 +49,16 @@ if ($internalEndpoint) {
     }
 
     switch ($endpoint) {
+        case '/api/proxystats':
+            $stats = [
+                        'instances' => getTotalAppStats($starrsTable), 
+                        'endpoints' => getTotalEndpointStats($starrsTable, $appsTable), 
+                        'usage'     => getTotalUsageStats($starrsTable, $appsTable, $usageTable)
+                    ];
+
+            $code       = 200;
+            $response   = $stats;
+            break;
         case '/api/addstarr':
             if (!$json) {
                 $code       = 400;
