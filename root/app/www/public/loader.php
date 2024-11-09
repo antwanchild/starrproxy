@@ -21,6 +21,11 @@ if (!defined('ABSOLUTE_PATH')) {
     }
 }
 
+//-- USED FOR MIGRATIONS, DEFINES SET BELOW
+$LOG_ROTATE_SIZE    = 2; //-- MB UNTIL ROTATE
+$LOG_AGE            = 2; //-- DELETE AFTER THIS AMOUNT OF DAYS
+$BACKUP_AGE         = 7; //-- DELETE AFTER THIS AMOUNT OF DAYS
+
 //-- SETUP SOME SHARED VARIABLES
 $page       = $_GET['page'] ?: $_POST['page'];
 $app        = $_GET['app'] ?: $_POST['app'];
@@ -70,6 +75,7 @@ define('APP_APIKEY', file_get_contents(APP_APIKEY_FILE));
 //-- LOAD THE TABLES
 $starrsTable    = $proxyDb->getStarrsTable();
 $appsTable      = $proxyDb->getAppsTable();
+$settingsTable  = $proxyDb->getSettings();
 $usageTable     = $usageDb->getUsageTable();
 
 //-- SOMETIMES THE TABLE IS BUSY, RETRY
@@ -77,3 +83,8 @@ if (!$usageTable && ($app || !$page || $page == 'home')) {
     sleep(1);
     $usageTable = $usageDb->getUsageTable();
 }
+
+//-- CONSTANTS BASED ON DATABASE SETTINGS
+define('LOG_ROTATE_SIZE', $settingsTable['logRotationSize'] ?: $LOG_ROTATE_SIZE);
+define('LOG_AGE', $settingsTable['logRetentionLength'] ?: $LOG_AGE);
+define('BACKUP_AGE', $settingsTable['backupRetentionLength'] ?: $BACKUP_AGE);

@@ -11,8 +11,6 @@ define('APP_NAME', 'Starr Proxy');
 define('APP_API_ERROR', APP_NAME .': %s');
 define('APP_URL', ($_SERVER['REQUEST_SCHEME'] ?: 'http') . '://'. $_SERVER['HTTP_HOST']);
 
-define('LOG_AGE', 2); //-- DELETE AFTER THIS AMOUNT OF DAYS
-define('BACKUP_AGE', 7); //-- DELETE AFTER THIS AMOUNT OF DAYS
 define('STARR_BACKUP_AGE', 2); //-- DELETE AFTER THIS AMOUNT OF DAYS
 
 //-- DATABASE
@@ -45,5 +43,4 @@ define('IS_MIGRATION_RUNNING', (file_exists(MIGRATION_FILE) ? true : false));
 define('SYSTEM_LOG', LOGS_PATH . 'system/app.log');
 define('MIGRATION_LOG', LOGS_PATH . 'system/migrations.log');
 define('CRON_HOUSEKEEPER_LOG', LOGS_PATH . 'system/cron-housekeeper.log');
-define('LOG_ROTATE_SIZE', 2); //-- MB UNTIL ROTATE
 define('LOG_LINES_PER_PAGE', 1000);
