@@ -7,6 +7,8 @@
 ----------------------------------
 */
 
+error_reporting(E_ERROR | E_PARSE);
+
 if (!$_SESSION) {
     session_start();
 }

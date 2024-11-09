@@ -39,6 +39,25 @@ if (!$_SESSION['IN_UI']) {
             </div>
         </div>
 
+        <!-- Loading modal -->
+        <div class="modal fade" id="loading-modal" style="z-index: 9999 !important;" data-bs-backdrop="static">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Loading</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body">
+                        <p>
+                            <div class="spinner-border text-primary" style="margin-right: 1em;"></div>
+                            I'm gathering everything needed to complete the request, give me just a moment...
+                        </p>
+                    </div>
+                    <div class="modal-footer">&nbsp;</div>
+                </div>
+            </div>
+        </div>
+
         <!-- Javascript Libraries -->
         <script src="libraries/jquery/jquery-3.4.1.min.js"></script>
         <script src="libraries/jquery/jquery-ui-1.13.2.min.js"></script>

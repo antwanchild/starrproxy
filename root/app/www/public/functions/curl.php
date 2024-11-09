@@ -30,7 +30,7 @@ function curl($url, $headers = [], $method = 'GET', $payload = '', $userPass = [
     curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
     curl_setopt($ch, CURLOPT_TIMEOUT, $timeout);
 
-    switch ($method) {
+    switch (strtolower($method)) {
         case 'delete':
         case 'put':
             curl_setopt($ch, CURLOPT_CUSTOMREQUEST, $method);

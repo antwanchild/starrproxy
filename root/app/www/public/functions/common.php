@@ -35,7 +35,7 @@ function automation()
     $shell = $shell ?? new Shell();
 
     //-- CREATE DIRECTORIES
-    $createFolders = [LOGS_PATH, LOGS_PATH . 'system/', BACKUP_PATH, APP_USER_TEMPLATES_PATH, DATABASE_PATH, MIGRATIONS_PATH];
+    $createFolders = [LOGS_PATH, LOGS_PATH . 'system/', LOGS_PATH . 'notifications/', BACKUP_PATH, APP_USER_TEMPLATES_PATH, DATABASE_PATH, MIGRATIONS_PATH];
     foreach ($createFolders as $createFolder) {
         if (!is_dir($createFolder)) {
             createDirectoryTree($createFolder);

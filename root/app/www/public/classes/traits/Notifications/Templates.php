@@ -2,7 +2,7 @@
 
 /*
 ----------------------------------
- ------  Created: 090324   ------
+ ------  Created: 110924   ------
  ------  Austin Best	   ------
 ----------------------------------
 */
@@ -12,28 +12,13 @@ trait NotificationTemplates
     function getTemplate($trigger)
     {
         switch ($trigger) {
-            case 'health':
+            case 'blocked':
                 return [
                         'event'     => '', 
-                        'container' => '', 
-                        'restarted' => ''
-                    ];
-            case 'prune':
-                return [
-                        'event'     => '', 
-                        'network'   => '', 
-                        'volume'    => '', 
-                        'image'     => '', 
-                        'imageList' => ''
-                    ];
-            case 'added':
-            case 'removed':
-            case 'stateChange':
-                return [
-                        'event'     => '', 
-                        'changes'   => '',
-                        'added'     => '',
-                        'removed'   => ''
+                        'proxyApp'  => '',
+                        'starrApp'  => '',
+                        'endpoint'  => '',
+                        'method'    => ''
                     ];
             case 'test':
                 return [
@@ -41,24 +26,6 @@ trait NotificationTemplates
                         'title'     => '', 
                         'message'   => ''
                     ];
-            case 'updated':
-            case 'updates':
-                return [
-                        'event'     => '', 
-                        'available' => '', 
-                        'updated'   => ''
-                ];
-            case 'cpuHigh':
-            case 'memHigh':
-                return [
-                        'event'         => '', 
-                        'container'     => '',
-                        'usage'         => '',
-                        'cpu'           => '', 
-                        'cpuThreshold'  => '',
-                        'mem'           => '',
-                        'memThreshold'  => ''
-                ];
             default:
                 return [];
         }

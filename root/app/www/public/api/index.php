@@ -207,6 +207,17 @@ if ($internalEndpoint) {
                 logger($logfile, $apikey, $endpoint, 401);
                 logger(str_replace('access.log', 'access_' . $proxiedApp['proxiedAppDetails']['name'] . '.log', $logfile), $apikey, $endpoint, 401);
                 $usageDb->adjustAppUsage($proxiedApp['proxiedAppDetails']['id'], 401);
+
+                if ($proxyDb->isNotificationTriggerEnabled('blocked')) {
+                    $payload    = [
+                                    'event'     => 'blocked', 
+                                    'proxyApp'  => $proxiedApp['proxiedAppDetails']['name'], 
+                                    'starrApp'  => $proxiedApp['starrAppDetails']['name'], 
+                                    'endpoint'  => $endpoint
+                                ];
+                    $notifications->notify(0, 'blocked', $payload);
+                }
+
                 apiResponse(401, ['error' => sprintf(APP_API_ERROR, 'provided apikey is missing access to ' . $endpoint)]);
             }
         }
@@ -215,6 +226,18 @@ if ($internalEndpoint) {
             logger($logfile, $apikey, $endpoint, 405);
             logger(str_replace('access.log', 'access_' . $proxiedApp['proxiedAppDetails']['name'] . '.log', $logfile), $apikey, $endpoint, 405);
             $usageDb->adjustAppUsage($proxiedApp['proxiedAppDetails']['id'], 405);
+
+            if ($proxyDb->isNotificationTriggerEnabled('blocked')) {
+                $payload    = [
+                                'event'     => 'blocked', 
+                                'proxyApp'  => $proxiedApp['proxiedAppDetails']['name'], 
+                                'starrApp'  => $proxiedApp['starrAppDetails']['name'], 
+                                'endpoint'  => $endpoint,
+                                'method'    => $method
+                            ];
+                $notifications->notify(0, 'blocked', $payload);
+            }
+
             apiResponse(405, ['error' => sprintf(APP_API_ERROR, 'provided apikey is missing access to ' . $endpoint . ' using the ' . $method . ' method')]);
         }
 

@@ -198,3 +198,26 @@ function reload()
     window.location.href = window.location.href;
 }
 // ---------------------------------------------------------------------------------------------
+function loadingStart()
+{
+    if ($('#loading-modal .btn-close').is(':visible')) {
+        loadingStop();
+    }
+
+    $('#loading-modal .btn-close').hide();
+    $('#loading-modal').modal('show');
+
+    $('#loading-modal .modal-header').dblclick(function () {
+        $('#loading-modal .btn-close').show();
+    });
+
+}
+// -------------------------------------------------------------------------------------------
+function loadingStop()
+{
+    setTimeout(function () {
+        $('#loading-modal').modal('hide');
+    }, 500);
+
+}
+// -------------------------------------------------------------------------------------------

@@ -25,6 +25,6 @@ trait NotificationPlatform
         }
 
         $this->notificationPlatformTable = $notificationPlatformTable;
-        return $notificationPlatformTable;
+        return $notificationPlatformTable ?: [];
     }
 }

@@ -25,7 +25,7 @@ trait NotificationLink
         }
 
         $this->notificationLinkTable = $notificationLinkTable;
-        return $notificationLinkTable;
+        return $notificationLinkTable ?: [];
     }
 
     public function updateNotificationLink($linkId, $triggerIds, $platformParameters, $senderName)

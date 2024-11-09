@@ -52,112 +52,12 @@ trait Telegram
                 $message .= $payload['message'];
                 $message .= "\n\n";
                 break;
-            case 'health':
-                $message .= APP_NAME . ': Health' . "\n";
-                $message .= 'Server: _' . $payload['server']['name'] . '_' . "\n\n";
-                $message .= '*' . $payload['container'] . '* → Restarted at ' . date('g:i A');
+            case 'blocked':
+                $message .= APP_NAME . ': Blocked API request' . "\n\n";
+                $message .= 'Proxied app: ' . $payload['proxyApp'] . "\n";
+                $message .= 'Starr app: ' . $payload['starrApp'] . "\n";
+                $message .= 'Endpoint: ' . ($payload['method'] ? '[' . strtoupper($payload['method']) . '] ' : '') . $payload['endpoint'] . "\n";
                 $message .= "\n\n";
-                break;
-            case 'prune':
-                $message .= APP_NAME . ': Pruned' . "\n";
-                $message .= 'Server: _' . $payload['server']['name'] . '_' . "\n\n";
-
-                if ($payload['network']) {
-                    $message .= "*Networks:*\n";
-                    foreach ($payload['network'] as $network) {
-                        $message .= '- ' . str_replace('_', '\_', $network) . "\n";
-                    }
-                    $message .= "\n";
-                }
-                if ($payload['volume']) {
-                    $message .= "*Volumes:*\n";
-                    foreach ($payload['volume'] as $volume) {
-                        $message .= '- ' . truncateMiddle($volume, 20) . "\n";
-                    }
-                    $message .= "\n";
-
-                }
-                if ($payload['image']) {
-                    $message .= "*Images:*\n";
-                    foreach ($payload['image'] as $image) {
-                        $message .= '- ' . $image . "\n";
-                    }
-                    $message .= "\n";
-
-                }
-                if ($payload['imageList']) {
-                    $message .= "*Image List:*\n";
-                    foreach ($payload['imageList'] as $imageList) {
-                        $message .= '- ' . $imageList['cr'] . ' (' . byteConversion($imageList['size']) . ')' . "\n";
-                    }
-                    $message .= "\n";
-
-                }
-                break;
-            case 'state':
-                $message .= APP_NAME . ': Container state change' . "\n";
-                $message .= 'Server: _' . $payload['server']['name'] . '_' . "\n\n";
-
-                if ($payload['added']) {
-                    $message .= '*Added*:' . "\n";
-                    foreach ($payload['added'] as $added) {
-                        $message .= '- ' . $added['container'] . "\n";
-                    }
-                    $message .= "\n";
-                }
-                if ($payload['removed']) {
-                    $message .= '*Removed*:' . "\n";
-                    foreach ($payload['removed'] as $removed) {
-                        $message .= '- ' . $removed['container'] . "\n";
-                    }
-                    $message .= "\n";
-                }
-                if ($payload['changes']) {
-                    $message .= '*Changed*:' . "\n";
-                    foreach ($payload['changes'] as $changes) {
-                        $message .= '- ' . $changes['container'] . ' [' . $changes['previous'] . ' → ' . $changes['current'] . ']' . "\n";
-                    }
-                    $message .= "\n";
-                }
-                break;
-            case 'updates':
-                $message .= APP_NAME . ': Updates' . "\n";
-                $message .= 'Server: _' . $payload['server']['name'] . '_' . "\n\n";
-
-                if ($payload['available']) {
-                    $message .= '*Available*:' . "\n";
-                    foreach ($payload['available'] as $available) {
-                        $message .= '- ' . $available['container'] . "\n";
-                    }
-                    $message .= "\n";
-                }
-                if ($payload['updated']) {
-                    $message .= '*Updated*:' . "\n";
-                    foreach ($payload['updated'] as $updated) {
-                        $message .= '- ' . $updated['container'] . ' [' . $updated['pre'] . ' → ' . $updated['post'] . ']' . "\n";
-                    }
-                    $message .= "\n";
-                }
-                break;
-            case 'usage':
-                $message .= APP_NAME . ': High usage' . "\n";
-                $message .= 'Server: _' . $payload['server']['name'] . '_' . "\n\n";
-
-                if ($payload['mem']) {
-                    $message .= '*Memory* (>= ' . $payload['memThreshold'] . '%):' . "\n";
-                    foreach ($payload['mem'] as $mem) {
-                        $message .=  '- ' . $mem['container'] . ' → ' . $mem['usage'] . "%\n";
-                    }
-                    $message .= "\n";
-                }
-
-                if ($payload['cpu']) {
-                    $message .= '*CPU* (>= ' . $payload['cpuThreshold'] . '%):' . "\n";
-                    foreach ($payload['cpu'] as $cpu) {
-                        $message .= '- ' . $cpu['container'] . ' → ' . $cpu['usage'] . "%\n";
-                    }
-                    $message .= "\n";
-                }
                 break;
         }
 

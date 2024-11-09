@@ -18,7 +18,7 @@ function logger($logfile, $apikey = '', $endpoint = '', $proxyCode = 200, $starr
         rename($logfile, str_replace('.log', '_' . date('Ymd') . '.log', $logfile));
     }
 
-    if (str_equals_any($logfile, [MIGRATION_LOG, SYSTEM_LOG])) {
+    if (str_equals_any($logfile, [MIGRATION_LOG, SYSTEM_LOG]) || str_contains_any($logfile, ['notifications/'])) {
         file_put_contents($logfile, date('c') . ' ' . $apikey . "\n", FILE_APPEND);
         return;
     }

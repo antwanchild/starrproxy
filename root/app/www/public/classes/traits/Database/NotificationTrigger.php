@@ -25,7 +25,7 @@ trait NotificationTrigger
         }
 
         $this->notificationTriggersTable = $notificationTriggersTable;
-        return $notificationTriggersTable;
+        return $notificationTriggersTable ?: [];
     }
 
     public function getNotificationTriggerFromName($name)

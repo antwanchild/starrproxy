@@ -65,6 +65,9 @@ if ($_SESSION['IN_UI']) {
 }
 $usageDb = new Database(USAGE_DATABASE_NAME);
 
+//-- INITIALIZE THE NOTIFICATION CLASS
+$notifications = new Notifications();
+
 //-- CREATE APIKEY IF MISSING
 if (!file_exists(APP_APIKEY_FILE)) {
     $key = generateApikey();

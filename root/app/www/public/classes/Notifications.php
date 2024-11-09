@@ -59,7 +59,7 @@ class Notifications
         logger($logfile, 'test payload=' . json_encode($tests[$name]));
 
         $result = $this->notify($linkId, $name, $tests[$name], true);
-    
+
         if ($result['code'] != 200) {
             $return = 'Code ' . $result['code'] . ', ' . $result['error'];
         }
