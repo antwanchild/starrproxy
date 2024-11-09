@@ -28,6 +28,8 @@ function deleteLog(log)
 // -------------------------------------------------------------------------------------------
 function openAppAccessLog(starr, appId, appName, key)
 {
+    loadingStart();
+
     $.ajax({
         type: 'POST',
         url: 'ajax/logs.php',
@@ -37,7 +39,10 @@ function openAppAccessLog(starr, appId, appName, key)
                 id: 'openAppAccessLog',
                 title: 'Access log viewer: ' + appName + ' (filter: ' + key + ')',
                 size: 'xxl',
-                body: resultData
+                body: resultData,
+                onOpen: function() {
+                    loadingStop();
+                }
             });
         }
     });

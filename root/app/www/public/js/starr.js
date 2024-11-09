@@ -179,7 +179,7 @@ function addEndpointAccess(app, id, endpoint, method, endpointHash)
         type: 'POST',
         url: 'ajax/starr.php',
         data: '&m=addEndpointAccess&app=' + app + '&id=' + id + '&endpoint=' + endpoint + '&method=' + method,
-        success: function () {
+        success: function (resultData) {
             if (resultData) {
                 toast('App access', resultData, 'error');
                 return;

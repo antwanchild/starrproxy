@@ -7,6 +7,8 @@
 ----------------------------------
 */
 
+error_reporting(E_ERROR | E_PARSE);
+
 if (!$_SESSION) {
     session_start();
 }
@@ -226,7 +228,7 @@ if ($_POST['m'] == 'resetUsage') {
 
 if ($_POST['m'] == 'addEndpointAccess') {
     $app = $proxyDb->getAppFromId($_POST['id'], $appsTable);
-    $app['endpoints'] = json_decode($app['endpoints']);
+    $app['endpoints'] = json_decode($app['endpoints'], true);
     $app['endpoints'][$_POST['endpoint']][] = $_POST['method'];
 
     $error = $proxyDb->updateApp($_POST['id'], $app);
