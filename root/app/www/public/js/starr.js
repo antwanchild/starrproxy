@@ -83,7 +83,12 @@ function openAppStarrAccess(app, id, clone = '')
                 id: 'openAppStarrAccess',
                 title: 'Grant starr API access',
                 size: 'lg',
-                body: resultData
+                body: resultData,
+                onOpen: function() {
+                    $('#access-template').select2({
+                        theme: 'bootstrap-5'
+                    });
+                }
             });
         }
     });

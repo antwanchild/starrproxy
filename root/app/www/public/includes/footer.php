@@ -43,6 +43,7 @@ if (!$_SESSION['IN_UI']) {
         <script src="libraries/jquery/jquery-3.4.1.min.js"></script>
         <script src="libraries/jquery/jquery-ui-1.13.2.min.js"></script>
         <script src="libraries/bootstrap/bootstrap.bundle.min.js"></script>
+        <script src="libraries/select2/select2.min.js"></script>
 
         <!-- Internal functions -->
         <?php

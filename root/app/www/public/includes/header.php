@@ -38,6 +38,10 @@ if (!$_SESSION['IN_UI']) {
         <!-- Customized Bootstrap Stylesheet -->
         <link href="libraries/bootstrap/bootstrap.min.css" rel="stylesheet">
 
+        <!-- Select2 Stylesheet -->
+        <link href="libraries/select2/select2.min.css" rel="stylesheet">
+        <link href="libraries/select2/select2-bootstrap-5-theme.min.css" rel="stylesheet">
+
         <!-- Internal Stylesheet -->
         <link href="css/style.css" rel="stylesheet">
     </head>

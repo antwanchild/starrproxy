@@ -17,3 +17,7 @@ pre {
 .modal-xxl {
     --bs-modal-width:95%;
 }
+
+.select2-container--open {
+    z-index: 10001;
+}
