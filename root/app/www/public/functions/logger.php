@@ -112,12 +112,13 @@ function getLog($logfile, $page = 1, $app = false)
 
     $starr      = $starr ?:new Starr();
     list($logLines, $file) = explode(' ', $shell->exec('wc -l ' . $logfile));
+    $logLines   = intval(trim($logLines));
     $cmd        = $app ? 'tail -' . LOG_LINES_PER_PAGE . ' ' . $logfile : 'awk -vs="' . $start . '" -ve="' . $end . '" \'NR>=s&&NR<=e\' "' . $logfile . '"';
     $file       = $shell->exec($cmd);
     $lines      = explode("\n", $file);
     rsort($lines);
 
-    $pages = ceil(intval(trim($logLines)) / LOG_LINES_PER_PAGE);
+    $pages = ceil($logLines / LOG_LINES_PER_PAGE);
     $pages = $pages > 1 ? $pages : 1;
 
     ?>
