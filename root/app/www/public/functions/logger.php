@@ -111,9 +111,9 @@ function getLog($logfile, $page = 1, $app = false)
     $end    = $start + LOG_LINES_PER_PAGE;
 
     $starr      = $starr ?:new Starr();
-    list($logLines, $file) = explode(' ', $shell->exec('wc -l ' . $logfile));
+    list($logLines, $file) = explode(' ', $shell->exec('wc -l "' . $logfile . '"'));
     $logLines   = intval(trim($logLines));
-    $cmd        = $app ? 'tail -' . LOG_LINES_PER_PAGE . ' ' . $logfile : 'awk -vs="' . $start . '" -ve="' . $end . '" \'NR>=s&&NR<=e\' "' . $logfile . '"';
+    $cmd        = $app ? 'tail -' . LOG_LINES_PER_PAGE . ' "' . $logfile . '"' : 'awk -vs="' . $start . '" -ve="' . $end . '" \'NR>=s&&NR<=e\' "' . $logfile . '"';
     $file       = $shell->exec($cmd);
     $lines      = explode("\n", $file);
     rsort($lines);
