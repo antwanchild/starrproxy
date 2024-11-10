@@ -110,7 +110,7 @@ if (!$_SESSION['IN_UI']) {
                                             <div class="dropdown-menu">
                                                 <div class="ms-2">
                                                     <span style="cursor: pointer;" onclick="openAppStarrAccess('<?= $app ?>', <?= $accessApp['id'] ?>)" title="Modify the <?= $accessApp['name'] ?> app's details"><i class="far fa-edit"></i> Modify</span><br>
-                                                    <span style="cursor: pointer;" onclick="openAppAccessLog('<?= $app ?>', <?= $accessApp['id'] ?>, '<?= $accessApp['name'] ?>', '<?= truncateMiddle($accessApp['apikey'], 20) ?>')" title="View <?= $accessApp['name'] ?> app logs"><i class="fas fa-newspaper"></i> Logs</span><br>
+                                                    <span style="cursor: pointer;" onclick="viewAppLog('<?= LOGS_PATH . 'access_'. $accessApp['name'] .'.log' ?>', '<?= truncateMiddle($accessApp['apikey'], 20) ?>', '<?= $accessApp['name'] ?>')" title="View <?= $accessApp['name'] ?> app logs"><i class="fas fa-newspaper"></i> Logs</span><br>
                                                     <span style="cursor: pointer;" onclick="openAppStarrAccess('<?= $app ?>', 99, <?= $accessApp['id'] ?>)" title="Clone the <?= $accessApp['name'] ?> app"><i class="far fa-clone"></i> Clone</span><br>
                                                     <span style="cursor: pointer;" onclick="openTemplateStarrAccess('<?= $app ?>', <?= $accessApp['id'] ?>)" title="Create a new template based on <?= $accessApp['name'] ?>'s settings"><i class="far fa-file-alt"></i> Create template</span><br>
                                                     <div class="dropdown-divider"></div>

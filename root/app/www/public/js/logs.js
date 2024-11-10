@@ -1,5 +1,7 @@
 function viewLog(log, index, page = 1)
 {
+    loadingStart();
+
     $('#log-viewer').html('Loading log...');
     $('[id^=app-log-]').removeClass('text-info');
     $('#app-log-' + index).addClass('text-info');
@@ -10,33 +12,22 @@ function viewLog(log, index, page = 1)
         data: '&m=viewLog&log=' + log + '&page=' + page + '&index=' + index,
         success: function (resultData) {
             $('#log-viewer').html(resultData);
+            loadingStop();
         }
     });
 }
 // -------------------------------------------------------------------------------------------
-function deleteLog(log)
-{
-    $.ajax({
-        type: 'POST',
-        url: 'ajax/logs.php',
-        data: '&m=deleteLog&log=' + log,
-        success: function (resultData) {
-            reload();
-        }
-    });
-}
-// -------------------------------------------------------------------------------------------
-function openAppAccessLog(starr, appId, appName, key)
+function viewAppLog(log, key, appName)
 {
     loadingStart();
 
     $.ajax({
         type: 'POST',
         url: 'ajax/logs.php',
-        data: '&m=openAppAccessLog&appName=' + appName + '&appId=' + appId + '&key=' + key + '&starr=' + starr,
+        data: '&m=viewAppLog&key=' + key + '&log=' + log,
         success: function (resultData) {
             dialogOpen({
-                id: 'openAppAccessLog',
+                id: 'viewAppLog',
                 title: 'Access log viewer: ' + appName + ' (filter: ' + key + ')',
                 size: 'xxl',
                 body: resultData,
@@ -46,5 +37,19 @@ function openAppAccessLog(starr, appId, appName, key)
             });
         }
     });
+}
+// -------------------------------------------------------------------------------------------
+function deleteLog(log)
+{
+    if (confirm('Are you sure you want to delete the log: ' + log + '?')) {
+        $.ajax({
+            type: 'POST',
+            url: 'ajax/logs.php',
+            data: '&m=deleteLog&log=' + log,
+            success: function () {
+                reload();
+            }
+        });
+    }
 }
 // -------------------------------------------------------------------------------------------

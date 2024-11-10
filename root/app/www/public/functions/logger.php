@@ -13,11 +13,6 @@ function logger($logfile, $apikey = '', $endpoint = '', $proxyCode = 200, $starr
         return;
     }
 
-    //-- ROTATE IT DAILY
-    if (file_exists($logfile) && date('Ymd') != date('Ymd', filemtime($logfile))) {
-        rename($logfile, str_replace('.log', '_' . date('Ymd') . '.log', $logfile));
-    }
-
     if (str_equals_any($logfile, [MIGRATION_LOG, SYSTEM_LOG]) || str_contains_any($logfile, ['notifications/'])) {
         file_put_contents($logfile, date('c') . ' ' . $apikey . "\n", FILE_APPEND);
         return;
@@ -43,51 +38,87 @@ function logger($logfile, $apikey = '', $endpoint = '', $proxyCode = 200, $starr
     }
 
     file_put_contents($logfile, $log . "\n", FILE_APPEND);
+
+    $rotateSize = LOG_ROTATE_SIZE * pow(1024, 2);
+    if (filesize($logfile) >= $rotateSize) {
+        $rotated = str_replace('.log', '_' . time() . '.log', $logfile);
+        rename($logfile, $rotated);
+    }
 }
 
 function getLogs()
 {
-    if (is_dir(LOGS_PATH)) {
-        $dir = opendir(LOGS_PATH);
-        while ($log = readdir($dir)) {
-            if (!str_contains($log, '.log')) {
-                continue;
-            }
+    $folders   = [
+                    LOGS_PATH,
+                    LOGS_PATH . 'system/',
+                    LOGS_PATH . 'notifications/'
+                ];
 
-            $logfile = str_replace('.log', '', $log);
-            list($access, $app, $date) = explode('_', $logfile);
+    $list = [];
+    foreach ($folders as $folder) {
+        if (is_dir($folder)) {
+            $dir = opendir($folder);
+            while ($log = readdir($dir)) {
+                if ($log[0] == '.') {
+                    continue;
+                }
+    
+                if ($folder == LOGS_PATH) {
+                    if (str_contains($log, '.log')) {
+                        $logfile = str_replace('.log', '', $log);
+                        list($access, $app, $date) = explode('_', $logfile);
+            
+                        if ($app && !is_numeric($app)) {
+                            $list[$app][$logfile] = $folder . $logfile . '.log';
+                            ksort($list[$app]);
+                        } else {
+                            $list['system']['access'][$logfile] = $folder . $logfile . '.log';
+                            ksort($list['system']['access']);
+                        }
+                    }
+                } else {
+                    $level2 = opendir($folder);
+                    while ($level2Log = readdir($level2)) {
+                        if ($level2Log[0] == '.') {
+                            continue;
+                        }
 
-            if ($app && !is_numeric($app)) {
-                $list[$app][] = $logfile . '.log';
-                krsort($list[$app]);
-            } else {
-                $list['system'][] = $logfile . '.log';
-                krsort($list['system']);
+                        $logfile = str_replace('.log', '', $level2Log);
+                        $group = str_replace(LOGS_PATH, '', $folder);
+                        if (!is_array($list['system'][$group]) || !in_array($folder . $logfile . '.log', $list['system'][$group])) {
+                            $list['system'][$group][$logfile] = $folder . $logfile . '.log';
+                            ksort($list['system'][$group]);
+                        }
+                    }
+                    closedir($level2);
+                }
             }
+            closedir($dir);
         }
-        closedir($dir);
     }
 
+    ksort($list['system']);
     ksort($list);
     return $list;
 }
 
-function getLog($appName, $page = 1, $app = false)
+function getLog($logfile, $page = 1, $app = false)
 {
     global $starr, $shell;
+
     $page   = $page <= 1 ? 1 : $page;
     $start  = $page == 1 ?  0 : $page * LOG_LINES_PER_PAGE;
     $end    = $start + LOG_LINES_PER_PAGE;
 
-    $starr ??= new Starr();
-    $logfile    = file_exists(LOGS_PATH . 'access_' . $appName . '.log') ? LOGS_PATH . 'access_' . $appName . '.log' : LOGS_PATH . $appName;
+    $starr      = $starr ?:new Starr();
     list($logLines, $file) = explode(' ', $shell->exec('wc -l ' . $logfile));
     $cmd        = $app ? 'tail -' . LOG_LINES_PER_PAGE . ' ' . $logfile : 'awk -vs="' . $start . '" -ve="' . $end . '" \'NR>=s&&NR<=e\' "' . $logfile . '"';
     $file       = $shell->exec($cmd);
     $lines      = explode("\n", $file);
     rsort($lines);
 
-    $pages = floor($logLines / LOG_LINES_PER_PAGE);
+    $pages = ceil($logLines / LOG_LINES_PER_PAGE);
+    $pages = $pages > 1 ? $pages : 1;
 
     ?>
     <ul class="nav nav-tabs" role="tablist">
@@ -99,18 +130,18 @@ function getLog($appName, $page = 1, $app = false)
             <a class="nav-link" data-bs-toggle="tab" href="#endpoints" aria-selected="false" tabindex="-1" role="tab">Endpoint usage</a>
         </li>
         <?php } ?>
-        <?php if (!$app && $pages > 1) { ?>
+        <?php if (!$app) { ?>
         <li class="ms-5">
             <?php if ($page != 1) { ?>
                 <?php if ($pages >= 2) { ?>
-                <button class="btn btn-sm btn-info" onclick="viewLog('<?= $appName ?>', '<?= $_POST['index'] ?>', 1)"><i class="fas fa-fast-backward"></i> Start</button>
+                <button class="btn btn-sm btn-info" onclick="viewLog('<?= $logfile ?>', '<?= $_POST['index'] ?>', 1)"><i class="fas fa-fast-backward"></i> Start</button>
                 <?php } ?>
-                <button class="btn btn-sm btn-info" onclick="viewLog('<?= $appName ?>', '<?= $_POST['index'] ?>', <?= $page - 1 ?>)"><i class="fas fa-backward"></i> Back</button>
+                <button class="btn btn-sm btn-info" onclick="viewLog('<?= $logfile ?>', '<?= $_POST['index'] ?>', <?= $page - 1 ?>)"><i class="fas fa-backward"></i> Back</button>
             <?php } ?>
             <?php if ($page != $pages) { ?>
-                <button class="btn btn-sm btn-info" onclick="viewLog('<?= $appName ?>', '<?= $_POST['index'] ?>', <?= $page + 1 ?>)"><i class="fas fa-forward"></i> Next</button>
+                <button class="btn btn-sm btn-info" onclick="viewLog('<?= $logfile ?>', '<?= $_POST['index'] ?>', <?= $page + 1 ?>)"><i class="fas fa-forward"></i> Next</button>
                 <?php if ($pages >= 2) { ?>
-                <button class="btn btn-sm btn-info" onclick="viewLog('<?= $appName ?>', '<?= $_POST['index'] ?>', <?= $pages ?>)"><i class="fas fa-fast-forward"></i> End</button>
+                <button class="btn btn-sm btn-info" onclick="viewLog('<?= $logfile ?>', '<?= $_POST['index'] ?>', <?= $pages ?>)"><i class="fas fa-fast-forward"></i> End</button>
                 <?php } ?>
             <?php } ?>
             <span class="ms-3">Page: <?= $page ?>/<?= $pages ?></span>
@@ -131,8 +162,12 @@ function getLog($appName, $page = 1, $app = false)
                             $error = '<span class="text-danger">[ERROR]</span> ';
                         }
 
-                        if (!str_contains($line, 'key:' . $_POST['key'])) {
+                        if ($app && !str_contains($line, 'key:' . $_POST['key'])) {
                             continue;
+                        }
+
+                        if (!str_contains($logfile, 'migrations')) {
+                            $line = htmlspecialchars($line);
                         }
 
                         $line = str_replace('key:' . $_POST['key'] . ';', '<span class="text-warning">key:' . $_POST['key'] . ';</span>', $line);

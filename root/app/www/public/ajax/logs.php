@@ -19,8 +19,8 @@ if (!$_SESSION['IN_UI']) {
 
 require '../loader.php';
 
-if ($_POST['m'] == 'openAppAccessLog') {
-    getLog($_POST['appName'], intval($_POST['page']), true);
+if ($_POST['m'] == 'viewAppLog') {
+    getLog($_POST['log'], 1, true);
 }
 
 if ($_POST['m'] == 'viewLog') {
@@ -28,5 +28,5 @@ if ($_POST['m'] == 'viewLog') {
 }
 
 if ($_POST['m'] == 'deleteLog') {
-    unlink(LOGS_PATH . $_POST['log']);
+    unlink($_POST['log']);
 }
