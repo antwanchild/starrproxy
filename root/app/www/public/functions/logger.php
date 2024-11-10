@@ -117,7 +117,7 @@ function getLog($logfile, $page = 1, $app = false)
     $lines      = explode("\n", $file);
     rsort($lines);
 
-    $pages = ceil($logLines / LOG_LINES_PER_PAGE);
+    $pages = ceil(intval(trim($logLines)) / LOG_LINES_PER_PAGE);
     $pages = $pages > 1 ? $pages : 1;
 
     ?>
