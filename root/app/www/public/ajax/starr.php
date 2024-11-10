@@ -100,6 +100,11 @@ if ($_POST['m'] == 'openAppStarrAccess') {
         }
     }
 
+    $templateOptions = getTemplateOptions();
+    if ($existing['template']) {
+        $templateOptions = str_replace('value="' . $existing['template'] . '"', 'selected value="' . $existing['template'] . '"', $templateOptions);
+    }
+
     ?>
     <?php if ($clone) { ?>
         <center><h4>Cloning: <span class="text-warning"><?= $clone['name'] ?></span></h4></center>
@@ -122,7 +127,7 @@ if ($_POST['m'] == 'openAppStarrAccess') {
         <tr>
             <td>Endpoint template<br><span class="text-small">Automatically select the endpoints based on an app template</span></td>
             <td>
-                <select class="form-select" id="access-template" onchange="applyTemplateOptions()"><?= getTemplateOptions() ?></select>
+                <select class="form-select" id="access-template" onchange="applyTemplateOptions()"><?= $templateOptions ?></select>
             </td>
         </tr>
         <tr>
