@@ -33,9 +33,7 @@ define('DATABASE_PATH', APP_DATA_PATH . 'database/');
 define('MIGRATIONS_PATH', ABSOLUTE_PATH . 'migrations/');
 
 //-- FILES
-define('SETTINGS_FILE', APP_DATA_PATH . 'settings.json');
 define('APP_APIKEY_FILE', APP_DATA_PATH . 'key');
-define('APP_USAGE_FILE', APP_DATA_PATH . 'usage.json');
 define('MIGRATION_FILE', APP_DATA_PATH . 'migration-in-progress.txt');
 define('IS_MIGRATION_RUNNING', (file_exists(MIGRATION_FILE) ? true : false));
 
