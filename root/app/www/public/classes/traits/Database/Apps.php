@@ -39,10 +39,19 @@ trait Apps
 
     public function addApp($fields = [])
     {
+        $fieldList = $valueList = '';
+
+        foreach ($fields as $field => $val) {
+            $val = str_equals_any($field, ['endpoints']) ? $val : $this->prepare($val);
+
+            $fieldList .= ($fieldList ? ', ' : '') . "`" . $field . "`";
+            $valueList .= ($valueList ? ', ' : '') . "'" . $val . "'";
+        }
+
         $q = "INSERT INTO " . APPS_TABLE . "
-              (`name`, `apikey`, `endpoints`, `starr_id`) 
+              (" . $fieldList . ") 
               VALUES 
-              ('" . $this->prepare($fields['name']) . "', '" . $this->prepare($fields['apikey']) . "', '" . json_encode($fields['endpoints']) . "', '" . intval($fields['starr_id']) . "')";
+              (" . $valueList . ")";
         $this->query($q);
 
         if ($this->error() != 'not an error') {
@@ -54,8 +63,17 @@ trait Apps
 
     public function updateApp($appId, $fields = [])
     {
+        $fieldList = '';
+
+        foreach ($fields as $field => $val) {
+            $val = str_equals_any($field, ['endpoints']) ? $val : $this->prepare($val);
+
+            $fieldList .= ($fieldList ? ', ' : '') . "`" . $field . "` = '" . $val . "'";
+            $fieldList .= ($fieldList ? ', ' : '') . "`" . $field . "` = '" . $val . "'";
+        }
+
         $q = "UPDATE " . APPS_TABLE . "
-              SET name = '" . $this->prepare($fields['name']) . "', apikey = '" . $this->prepare($fields['apikey']) . "', endpoints = '" . json_encode($fields['endpoints']) . "', starr_id = '" . intval($fields['starr_id']) . "'
+              SET " . $fieldList . "
               WHERE id = " . intval($appId);
         $this->query($q);
 

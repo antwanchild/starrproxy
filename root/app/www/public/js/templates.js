@@ -41,7 +41,6 @@ function applyTemplateOptions()
                 });
             });
 
-            $('#access-template').select2('val', '0');
             toast('Templates', 'The selected template access has been applied', 'info');
         }
     });

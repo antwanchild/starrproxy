@@ -122,8 +122,8 @@ if ($internalEndpoint) {
                             $fields = [
                                         'name'      => $request['name'], 
                                         'apikey'    => $scopeKey, 
-                                        'starr_id'  => $starrApp['id'],
-                                        'endpoints' => $scopeAccess
+                                        'starr_id'  => intval($starrApp['id']),
+                                        'endpoints' => json_encode($scopeAccess, JSON_UNESCAPED_SLASHES)
                                     ];
                             $error = $proxyDb->addApp($fields);
 

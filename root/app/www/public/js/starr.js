@@ -74,6 +74,8 @@ function deleteStarr(starrId, app)
 // -------------------------------------------------------------------------------------------
 function openAppStarrAccess(app, id, clone = '')
 {
+    loadingStart();
+
     $.ajax({
         type: 'POST',
         url: 'ajax/starr.php',
@@ -88,6 +90,8 @@ function openAppStarrAccess(app, id, clone = '')
                     $('#access-template').select2({
                         theme: 'bootstrap-5'
                     });
+
+                    loadingStop();
                 }
             });
         }
@@ -112,7 +116,15 @@ function saveAppStarrAccess(app, id)
         return;
     }
 
-    let params = '';
+    loadingStart();
+
+    let params = '&app=' + app;
+    params += '&name=' + $('#access-name').val();
+    params += '&apikey=' + $('#access-apikey').val();
+    params += '&id=' + id;
+    params += '&starr_id=' + $('#access-instance').val();
+    params += '&template=' + $('#access-template').val();
+
     $.each($('[id^=endpoint-counter-]'), function() {
         const counter = $(this).attr('id').replace('endpoint-counter-', '');
         params += '&endpoint-' + counter + '=' + $(this).data('endpoint');
@@ -123,8 +135,10 @@ function saveAppStarrAccess(app, id)
     $.ajax({
         type: 'POST',
         url: 'ajax/starr.php',
-        data: '&m=saveAppStarrAccess&app=' + app + '&name=' + $('#access-name').val() + '&apikey=' + $('#access-apikey').val() + '&id=' + id + '&starr_id=' + $('#access-instance').val() + params,
+        data: '&m=saveAppStarrAccess' + params,
         success: function (resultData) {
+            loadingStop();
+
             if (resultData) {
                 toast('App access', resultData, 'error');
                 return;

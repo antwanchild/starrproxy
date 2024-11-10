@@ -91,8 +91,9 @@ if (!$_SESSION['IN_UI']) {
                 $accessApp['endpoints'] = json_decode($accessApp['endpoints'], true) ?: [];
                 $usage = $usageDb->getStarrAppUsage($accessApp['id']);
 
-                if (file_exists('templates/' . $app . '/' . strtolower($accessApp['name']) . '.json')) {
-                    $templateEndpoints = getFile('templates/' . $app . '/' . strtolower($accessApp['name']) . '.json');
+                $templateFile = file_exists($accessApp['template']) ? $accessApp['template'] : str_replace('../', './', $accessApp['template']);
+                if (file_exists($templateFile)) {
+                    $templateEndpoints = getFile($templateFile);
                     $template = ', Template: ' . count($templateEndpoints) . ' endpoint' . (count($templateEndpoints) == 1 ? '' : 's');
                 }
                 ?>

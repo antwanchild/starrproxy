@@ -200,10 +200,12 @@ if ($_POST['m'] == 'saveAppStarrAccess') {
         $endpoints[$val][] = $_POST['method-' . $id];
     }
 
+    $fields = [];
     $fields['name']         = $_POST['name'];
     $fields['apikey']       = $_POST['apikey'];
-    $fields['starr_id']     = $_POST['starr_id'];
-    $fields['endpoints']    = $endpoints;
+    $fields['starr_id']     = intval($_POST['starr_id']);
+    $fields['endpoints']    = json_encode($endpoints, JSON_UNESCAPED_SLASHES);
+    $fields['template']     = $_POST['template'];
 
     if ($_POST['id'] != 99) {
         $error = $proxyDb->updateApp($_POST['id'], $fields);
@@ -230,6 +232,7 @@ if ($_POST['m'] == 'addEndpointAccess') {
     $app = $proxyDb->getAppFromId($_POST['id'], $appsTable);
     $app['endpoints'] = json_decode($app['endpoints'], true);
     $app['endpoints'][$_POST['endpoint']][] = $_POST['method'];
+    $app['endpoints'] = json_encode($app['endpoints'], JSON_UNESCAPED_SLASHES);
 
     $error = $proxyDb->updateApp($_POST['id'], $app);
 
