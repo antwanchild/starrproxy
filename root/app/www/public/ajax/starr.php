@@ -243,3 +243,21 @@ if ($_POST['m'] == 'addEndpointAccess') {
 
     echo $error;
 }
+
+if ($_POST['m'] == 'autoAdjustAppEndpoints') {
+    foreach ($appsTable as $app) {
+        if ($app['id'] != $_POST['appId']) {
+            continue;
+        }
+
+        $templateFile   = file_exists($app['template']) ? $app['template'] : str_replace('../', './', $app['template']);
+        $appTemplate    = getFile($templateFile);
+
+        if ($appTemplate) {
+            $app['endpoints'] = json_encode($appTemplate);
+            $error = $proxyDb->updateApp($_POST['appId'], $app);
+        }
+
+        break;
+    }
+}

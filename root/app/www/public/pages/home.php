@@ -130,6 +130,71 @@ $getTotalUsageStats     = getTotalUsageStats($starrsTable, $appsTable, $usageTab
                     </div>
                 </div>
             </div>
+            <div class="col-sm-12 col-lg-4">
+                <div class="card mb-3">
+                    <div class="card-header">Template problems</div>
+                    <div class="card-body">
+                        <?php
+                        $noTemplate = '';
+                        $notMatching = [];
+
+                        foreach ($appsTable as $app) {
+                            if (!$app['template']) {
+                                $noTemplate .= ($noTemplate ? ', ' : '') . $app['name'];
+                            }
+
+                            $templateFile   = file_exists($app['template']) ? $app['template'] : str_replace('../', './', $app['template']);
+                            $appAccess      = json_decode($app['endpoints'], true);
+                            $appTemplate    = getFile($templateFile);
+
+                            if (count($appAccess) != count($appTemplate)) {
+                                foreach ($starrsTable as $starrApp) {
+                                    if ($starrApp['id'] == $app['starr_id']) {
+                                        $notMatching[$starrApp['name']][] = ['id' => $app['id'], 'app' => $app['name'], 'template' => count($appTemplate), 'endpoints' => count($appAccess)];
+                                        break;
+                                    }
+                                }
+                            }
+                        }
+
+                        if ($notMatching) {
+                            ?>
+                            <table class="table table-bordered table-hover">
+                                <tr>
+                                    <td>Starr</td>
+                                    <td>App</td>
+                                    <td>App endpoints</td>
+                                    <td>Template endpoints</td>
+                                    <td></td>
+                                </tr>
+                                <?php
+                                foreach ($notMatching as $starrAppName => $starrAppApps) {
+                                    foreach ($starrAppApps as $starrAppApp) {
+                                        ?>
+                                        <tr>
+                                            <td><?= $starrAppName ?></td>
+                                            <td><?= $starrAppApp['app'] ?></td>
+                                            <td><?= $starrAppApp['endpoints'] ?></td>
+                                            <td><?= $starrAppApp['template'] ?></td>
+                                            <td><i class="far fa-check-circle text-success" title="Match endpoints to template" style="cursor:pointer;" onclick="autoAdjustAppEndpoints(<?= $starrAppApp['id'] ?>)"></i></td>
+                                        </tr>
+                                        <?php
+                                    }
+                                }
+                                ?>
+                            </table>
+                            <?php
+                        } else {
+                            ?>All apps with a template assigned match their template<?php
+                        }
+
+                        if ($noTemplate) {
+                            ?><hr>Apps with no template assigned: <?= $noTemplate ?><?php
+                        }
+                        ?>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 </div>

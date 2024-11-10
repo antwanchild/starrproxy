@@ -205,3 +205,17 @@ function addEndpointAccess(app, id, endpoint, method, endpointHash)
     });
 }
 // -------------------------------------------------------------------------------------------
+function autoAdjustAppEndpoints(appId)
+{
+    loadingStart();
+
+    $.ajax({
+        type: 'POST',
+        url: 'ajax/starr.php',
+        data: '&m=autoAdjustAppEndpoints&appId=' + appId,
+        success: function () {
+            reload();
+        }
+    });
+}
+// -------------------------------------------------------------------------------------------
