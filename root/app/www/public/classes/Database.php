@@ -40,6 +40,7 @@ class Database
     public function connect($dbFile)
     {
         $db = new SQLite3($dbFile, SQLITE3_OPEN_CREATE | SQLITE3_OPEN_READWRITE);
+        $db->exec('PRAGMA journal_mode = WAL;');
         $this->db = $db;
     }
 
