@@ -78,4 +78,20 @@ trait Starrs
 
         return;
     }
+
+    public function updateStarrAppSetting($id, $field, $value)
+    {
+        $value = $field != 'endpoints' ? $this->prepare($value) : $value;
+
+        $q = "UPDATE " . STARRS_TABLE . "
+              SET `" . $field . "` = '" . $value . "'
+              WHERE id = " . intval($id);
+        $this->query($q);
+
+        if ($this->error() != 'not an error') {
+            return $this->error();
+        }
+
+        return;
+    }
 }

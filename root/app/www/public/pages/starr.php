@@ -37,9 +37,22 @@ if (!$_SESSION['IN_UI']) {
                         if ($starrInstance['starr'] != $starr->getStarrInterfaceIdFromName($app)) {
                             continue;
                         }
+
+                        $test       = $starr->testConnection($app, $starrInstance['url'], $starrInstance['apikey']);
+                        $version    = $test['responseHeaders']['X-Application-Version'][0];
+                        $branch     = $test['response']['branch'];
+
+                        if ($test['response']['instanceName'] != $starrInstance['name']) {
+                            $proxyDb->updateStarrAppSetting($starrInstance['id'], 'name', $test['response']['instanceName']);
+                            $starrInstance['name'] = $test['response']['instanceName'];
+                        }
+
                         ?>
                         <tr>
-                            <td><?= $starrInstance['name'] ?></td>
+                            <td>
+                                <?= $starrInstance['name'] ?><br>
+                                <span class="text-small"><?= $branch ?> → v<?= $version ?></span>
+                            </td>
                             <td><input type="text" class="form-control" id="instance-url-<?= $starrInstance['id'] ?>" placeholder="http://localhost:1111" value="<?= $starrInstance['url'] ?>"></td>
                             <td>
                                 <div class="input-group mb-3">
