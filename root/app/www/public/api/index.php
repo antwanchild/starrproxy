@@ -178,9 +178,9 @@ if ($internalEndpoint) {
 
             if ($proxyDb->isNotificationTriggerEnabled('blocked')) {
                 $payload    = [
-                                'event'     => 'blocked', 
-                                'proxyApp'  => $proxiedApp['proxiedAppDetails']['name'], 
-                                'starrApp'  => $proxiedApp['starrAppDetails']['name'], 
+                                'event'     => 'blocked',
+                                'proxyApp'  => $proxiedApp['proxiedAppDetails']['name'],
+                                'starrApp'  => $proxiedApp['starrAppDetails']['name'],
                                 'endpoint'  => $endpoint
                             ];
                 $notifications->notify(0, 'blocked', $payload);

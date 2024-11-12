@@ -145,13 +145,16 @@ $getTotalUsageStats     = getTotalUsageStats($starrsTable, $appsTable, $usageTab
 
                             $templateFile   = file_exists($app['template']) ? $app['template'] : str_replace('../', './', $app['template']);
                             $appAccess      = json_decode($app['endpoints'], true);
-                            $appTemplate    = getFile($templateFile);
 
-                            if (count($appAccess) != count($appTemplate)) {
-                                foreach ($starrsTable as $starrApp) {
-                                    if ($starrApp['id'] == $app['starr_id']) {
-                                        $notMatching[$starrApp['name']][] = ['id' => $app['id'], 'app' => $app['name'], 'template' => count($appTemplate), 'endpoints' => count($appAccess)];
-                                        break;
+                            if (file_exists($templateFile)) {
+                                $appTemplate = getFile($templateFile);
+
+                                if (count($appAccess) != count($appTemplate)) {
+                                    foreach ($starrsTable as $starrApp) {
+                                        if ($starrApp['id'] == $app['starr_id']) {
+                                            $notMatching[$starrApp['name']][] = ['id' => $app['id'], 'app' => $app['name'], 'template' => count($appTemplate), 'endpoints' => count($appAccess)];
+                                            break;
+                                        }
                                     }
                                 }
                             }

@@ -11,6 +11,11 @@ function getFile($file)
 {
     logger(SYSTEM_LOG, 'getFile() ' . $file);
 
+    if (!$file) {
+        logger(SYSTEM_LOG, '$file is empty');
+        return [];
+    }
+
     if (!file_exists($file)) {
         file_put_contents($file, '[]');
     }
