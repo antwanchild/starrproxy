@@ -169,60 +169,27 @@ if ($internalEndpoint) {
             readfile($proxyBackup);
         }
     } else {
-        // CHECK IF THE ENDPOINT HAS WILDCARDS: /{...}/{...} OR /{...}
-        if (!$proxiedApp['access'][$endpoint]) {
-            $endpointRegexes    = ['/(.*)\/(.*)\/(.*)/', '/(.*)\/(.*)/'];
-            $wildcardRegexes    = ['/(.*)({.*})\/({.*})/', '/(.*)({.*})/'];
-            $wildcard           = false;
+        if ($accessEndpoint = $starr->isAllowedEndpoint($proxiedApp['access'], $endpoint)) {
+            $endpoint = $accessEndpoint;
+        } else {
+            logger($logfile, $apikey, $endpoint, 401);
+            logger(str_replace('access.log', 'access_' . $proxiedApp['proxiedAppDetails']['name'] . '.log', $logfile), $apikey, $endpoint, 401);
+            $usageDb->adjustAppUsage($proxiedApp['proxiedAppDetails']['id'], 401);
 
-            foreach ($wildcardRegexes as $index => $wildcardRegex) {
-                preg_match($endpointRegexes[$index], $endpoint, $requestMatches);
-
-                if (!$requestMatches) {
-                    continue;
-                }
-
-                foreach ($proxiedApp['access'] as $accessEndpoint => $accessMethods) {
-                    preg_match($wildcardRegex, $accessEndpoint, $accessMatches);
-    
-                    if (!$accessMatches) {
-                        continue;
-                    }
-
-                    if ($accessMatches[1] == $requestMatches[1] . '/') {
-                        if (count($accessMatches) == count($requestMatches)) {
-                            $wildcard   = true;
-                            $endpoint   = $accessEndpoint; //-- ALLOW LATER CHECKS TO PASS
-                            break;
-                        }
-                    }
-                }
-
-                if ($wildcard) {
-                    break;
-                }
+            if ($proxyDb->isNotificationTriggerEnabled('blocked')) {
+                $payload    = [
+                                'event'     => 'blocked', 
+                                'proxyApp'  => $proxiedApp['proxiedAppDetails']['name'], 
+                                'starrApp'  => $proxiedApp['starrAppDetails']['name'], 
+                                'endpoint'  => $endpoint
+                            ];
+                $notifications->notify(0, 'blocked', $payload);
             }
 
-            if (!$wildcard) {
-                logger($logfile, $apikey, $endpoint, 401);
-                logger(str_replace('access.log', 'access_' . $proxiedApp['proxiedAppDetails']['name'] . '.log', $logfile), $apikey, $endpoint, 401);
-                $usageDb->adjustAppUsage($proxiedApp['proxiedAppDetails']['id'], 401);
-
-                if ($proxyDb->isNotificationTriggerEnabled('blocked')) {
-                    $payload    = [
-                                    'event'     => 'blocked', 
-                                    'proxyApp'  => $proxiedApp['proxiedAppDetails']['name'], 
-                                    'starrApp'  => $proxiedApp['starrAppDetails']['name'], 
-                                    'endpoint'  => $endpoint
-                                ];
-                    $notifications->notify(0, 'blocked', $payload);
-                }
-
-                apiResponse(401, ['error' => sprintf(APP_API_ERROR, 'provided apikey is missing access to ' . $endpoint)]);
-            }
+            apiResponse(401, ['error' => sprintf(APP_API_ERROR, 'provided apikey is missing access to ' . $endpoint)]);
         }
 
-        if (!in_array($method, $proxiedApp['access'][$endpoint])) {
+        if (!$accessMethod = $starr->isAllowedEndpointMethod($proxiedApp['access'], $endpoint, $method)) {
             logger($logfile, $apikey, $endpoint, 405);
             logger(str_replace('access.log', 'access_' . $proxiedApp['proxiedAppDetails']['name'] . '.log', $logfile), $apikey, $endpoint, 405);
             $usageDb->adjustAppUsage($proxiedApp['proxiedAppDetails']['id'], 405);

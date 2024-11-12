@@ -194,19 +194,15 @@ function getLog($logfile, $page = 1, $app = false)
                 <h4>Endpoint usage <span class="text-small">(<?= count($endpointUsage) ?> endpoint<?= count($endpointUsage) == 1 ? '' : 's' ?>)</span></h4>
                 <?php
                 foreach ($endpointUsage as $endpoint => $methods) {
-                    foreach ($methods as $method => $usage) {
-                        $accessError = true;
+                    $accessEndpoint = $starr->isAllowedEndpoint($proxiedApp['access'], $endpoint);
 
-                        if ($proxiedApp['access'][$endpoint] || $proxiedApp['access'][strtolower($endpoint)]) {
-                            if (in_array(strtolower($method), $proxiedApp['access'][$endpoint]) || in_array(strtolower($method), $proxiedApp['access'][strtolower($endpoint)])) {
-                                $accessError = false;
-                            }
-                        }
+                    foreach ($methods as $method => $usage) {
+                        $accessMethod = $starr->isAllowedEndpointMethod($proxiedApp['access'], $accessEndpoint, $method);
 
                         ?>
-                            <i id="disallowed-endpoint-<?= md5($endpoint.$method) ?>" class="far fa-times-circle text-danger" title="Disallowed endpoint, click to allow it" style="display: <?= $accessError ? 'inline-block' : 'none' ?>; cursor: pointer;" onclick="addEndpointAccess('<?= $app ?>', <?= $proxiedApp['proxiedAppDetails']['id'] ?>, '<?= $endpoint ?>', '<?= $method ?>', '<?= md5($endpoint.$method) ?>')"></i> 
-                            <i id="allowed-endpoint-<?= md5($endpoint.$method) ?>" class="far fa-check-circle text-success" title="Allowed endpoint" style="display: <?= !$accessError ? 'inline-block' : 'none' ?>;"></i>
-                            [<?= strtoupper($method) ?>] <?= $endpoint . ': ' . number_format($usage) ?> hit<?= $usage == 1 ? '' : 's' ?><br>
+                        <i id="disallowed-endpoint-<?= md5($endpoint.$method) ?>" class="far fa-times-circle text-danger" title="Disallowed endpoint, click to allow it" style="display: <?= !$accessMethod ? 'inline-block' : 'none' ?>; cursor: pointer;" onclick="addEndpointAccess('<?= $app ?>', <?= $proxiedApp['proxiedAppDetails']['id'] ?>, '<?= $endpoint ?>', '<?= $method ?>', '<?= md5($endpoint.$method) ?>')"></i> 
+                        <i id="allowed-endpoint-<?= md5($endpoint.$method) ?>" class="far fa-check-circle text-success" title="Allowed endpoint" style="display: <?= $accessMethod ? 'inline-block' : 'none' ?>;"></i>
+                        [<?= strtoupper($method) ?>] <?= ($accessEndpoint != $endpoint ? $accessEndpoint . ' → ' : '') . $endpoint . ': ' . number_format($usage) ?> hit<?= $usage == 1 ? '' : 's' ?><br>
                         <?php
                     }
                 }

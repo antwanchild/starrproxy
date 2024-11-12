@@ -211,4 +211,58 @@ class Starr
     
         return [];
     }
+
+    public function isAllowedEndpoint($endpoints, $endpoint)
+    {
+        if (!$endpoints || !$endpoint) {
+            return;
+        }
+
+        if ($endpoints[$endpoint]) {
+            return $endpoint;
+        }
+
+        // CHECK IF THE ENDPOINT HAS WILDCARDS: /{...}/{...} OR /{...}
+        if (!$endpoints[$endpoint]) {
+            $endpointRegexes    = ['/(.*)\/(.*)\/(.*)/', '/(.*)\/(.*)/'];
+            $wildcardRegexes    = ['/(.*)({.*})\/({.*})/', '/(.*)({.*})/'];
+
+            foreach ($wildcardRegexes as $index => $wildcardRegex) {
+                preg_match($endpointRegexes[$index], $endpoint, $requestMatches);
+
+                if (!$requestMatches) {
+                    continue;
+                }
+
+                foreach ($endpoints as $accessEndpoint => $accessMethods) {
+                    preg_match($wildcardRegex, $accessEndpoint, $accessMatches);
+    
+                    if (!$accessMatches) {
+                        continue;
+                    }
+
+                    if ($accessMatches[1] == $requestMatches[1] . '/') {
+                        if (count($accessMatches) == count($requestMatches)) {
+                            return $accessEndpoint;
+                        }
+                    }
+                }
+            }
+        }
+
+        return;
+    }
+
+    public function isAllowedEndpointMethod($endpoints, $endpoint, $method)
+    {
+        if (!$endpoints || !$endpoint || !$method) {
+            return false;
+        }
+
+        if (in_array($method, $endpoints[$endpoint]) || in_array(strtolower($method), $endpoints[$endpoint])) {
+            return true;
+        }
+
+        return false;
+    }
 }
