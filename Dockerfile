@@ -18,6 +18,10 @@ RUN \
   # install sqlite3
 RUN apk add --no-cache php82-sqlite3
 
+# healthchecks
+HEALTHCHECK --interval=60s --timeout=30s --start-period=180s --start-interval=10s --retries=5 \
+  CMD curl -f http://localhost/health.html > /dev/null || exit 1
+
 # add local files
 COPY root/ /
 
