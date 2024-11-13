@@ -149,7 +149,7 @@ Name: `App config`, Host: `/volume1/data/docker/starrproxy/config`, Container: `
 
 #### Ports
 
-Inside: `80`, Outside: `9999`
+Inside: `80`, Outside: `9090`
 
 #### Variables
 
