@@ -56,6 +56,54 @@ closedir($dir);
     </div>
     <div class="col-sm-12">
         <div class="card border-default mb-3">
+            <div class="card-header">UI</div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-bordered table-hover">
+                        <tbody>
+                            <?php
+                            foreach (StarrApps::LIST as $index => $starrApp) {
+                                $starrApp = ucfirst($starrApp);
+                                ?>
+                                <tr>
+                                    <td class="w-25">Nav link: <?= $starrApp ?></td>
+                                    <td>
+                                        <div class="form-check form-switch">
+                                            <input class="form-check-input" type="checkbox" id="setting-uiHeader<?= $starrApp ?>" <?= $settingsTable['uiHeader' . $starrApp] ? 'checked' : '' ?>>
+                                            <label class="form-check-label" for="setting-uiHeader<?= $starrApp ?>">Show</label>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <?php
+                            }
+                            ?>
+                            <tr>
+                                <td class="w-25">Nav link: Notifications</td>
+                                <td>
+                                    <div class="form-check form-switch">
+                                        <input class="form-check-input" type="checkbox" id="setting-uiHeaderNotifications" <?= $settingsTable['uiHeaderNotifications'] ? 'checked' : '' ?>>
+                                        <label class="form-check-label" for="setting-uiHeaderNotifications">Show</label>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="w-25">Nav link: Help</td>
+                                <td>
+                                    <div class="form-check form-switch">
+                                        <input class="form-check-input" type="checkbox" id="setting-uiHeaderHelp" <?= $settingsTable['uiHeaderHelp'] ? 'checked' : '' ?>>
+                                        <label class="form-check-label" for="setting-uiHeaderHelp">Show</label>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <br>** Refresh the page after changing UI settings
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-sm-12">
+        <div class="card border-default mb-3">
             <div class="card-header">Database</div>
             <div class="card-body">
                 <div class="table-responsive">

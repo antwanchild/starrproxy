@@ -67,13 +67,13 @@ if (!$_SESSION['IN_UI']) {
                             }
 
                             ?>
-                            <li class="nav-item">
+                            <li class="nav-item <?= !$settingsTable['uiHeader' . ucfirst($starrApp)] ? 'd-none' : '' ?>">
                                 <a class="nav-link <?= $active ? 'active' : '' ?>" href="/?app=<?= $starrApp ?>"><img src="images/logos/<?= $starrApp ?>.png" style="height: 18px;"> <span class="me-3"><?= ucfirst($starrApp) ?> - <?= $starrAppCount ?></span></a>
                             </li>
                             <?php
                         }
                         ?>
-                        <li class="nav-item">
+                        <li class="nav-item <?= !$settingsTable['uiHeaderNotifications'] ? 'd-none' : '' ?>">
                             <a class="nav-link <?= $page == 'notifications' ? 'active' : '' ?>" href="/?page=notifications"><i class="fas fa-comment-dots me-2"></i> <span class="me-3">Notifications</span></a>
                         </li>
                         <li class="nav-item">
@@ -85,7 +85,7 @@ if (!$_SESSION['IN_UI']) {
                         <li class="nav-item">
                             <a class="nav-link <?= $page == 'settings' ? 'active' : '' ?>" href="/?page=settings"><i class="fas fa-cog"></i> <span class="me-3">Settings</span></a>
                         </li>
-                        <li class="nav-item">
+                        <li class="nav-item <?= !$settingsTable['uiHeaderHelp'] ? 'd-none' : '' ?>">
                             <a class="nav-link <?= $page == 'help' ? 'active' : '' ?>" href="/?page=help"><i class="far fa-question-circle"></i> <span class="me-3">Help</span></a>
                         </li>
                         <li class="nav-item">
