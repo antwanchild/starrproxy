@@ -25,6 +25,16 @@ HEALTHCHECK --interval=60s --timeout=30s --start-period=180s --start-interval=10
 # add local files
 COPY root/ /
 
+ARG COMMIT=unknown
+ARG COMMITS=0
+ARG BRANCH=unknown
+ARG COMMIT_MSG=unknown
+RUN echo -e "\n//-- DOCKERFILE DEFINES"                         >> /app/www/public/includes/constants.php \
+    && echo "define('DOCKERFILE_BUILD_DATE', '${BUILD_DATE}');" >> /app/www/public/includes/constants.php \
+    && echo "define('DOCKERFILE_COMMIT', '${COMMIT}');"         >> /app/www/public/includes/constants.php \
+    && echo "define('DOCKERFILE_COMMITS', '${COMMITS}');"       >> /app/www/public/includes/constants.php \
+    && echo "define('DOCKERFILE_BRANCH', '${BRANCH}');"         >> /app/www/public/includes/constants.php
+
 # ports and volumes
 EXPOSE 80 443
 
