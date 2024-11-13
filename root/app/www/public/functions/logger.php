@@ -67,7 +67,7 @@ function getLogs()
                     if (str_contains($log, '.log')) {
                         $logfile = str_replace('.log', '', $log);
                         list($access, $app, $date) = explode('_', $logfile);
-            
+
                         if ($app && !is_numeric($app)) {
                             $list[$app][$logfile] = $folder . $logfile . '.log';
                             ksort($list[$app]);

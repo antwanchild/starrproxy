@@ -1,10 +1,23 @@
-![Logo](root/app/www/public/images/logo-64.png)
+<h1 align="center">
+  <img src="./root/app/www/public/images/logo-64.png" title="Starr Proxy" alt="Starr Proxy" /><br/>
+  Starr Proxy
+</h1>
 
-# Starr Proxy
+## Note
 
-## Note!
+This is still being tested and generating templates. Feel free to join the Notifiarr discord and ask questions in the `#starrproxy` channel or help out with templates
 
-This is still very much in development (mainly the templates) and being tested. Feel free to join the Notifiarr discord and ask questions in the `#starrproxy` channel
+## Navigation
+
+- [Purpose](#purpose)
+- [Templates](#app-templates)
+  - [Current templates](#current-templates)
+- [Automation](#automation)
+- [Installation](#installation)
+  - [Compose example](#compose-example)
+  - [Run example](#run-example)
+  - [Environment variables](#environment-variables)
+- [Screenshots](#screenshots)
 
 ## Purpose
 
@@ -16,7 +29,21 @@ Access logs per app are generated so you can see everytime the app hits the prox
 
 ## App templates
 
-There are some pre-built templates than enable just the api access the app actually needs so they are quick and easy to setup. More will be added in time for the common 3rd party apps.
+There are some pre-built templates that enable just the api access the app actually needs so they are quick and easy to setup. More will be added in time for the common 3rd party apps.
+
+### Current templates
+
+- Autobrr
+- Bazarr
+- DAPS
+- Jellyseerr
+- Kometa
+- Nabarr
+- Notifiarr
+- Omegabrr
+- Overseerr
+- Recyclarr
+- Unpackerr
 
 ## Automation
 
@@ -80,7 +107,9 @@ Errors:
 }
 ```
 
-## Compose example
+## Installation
+
+### Compose example
 
 ``` yaml
 services:
@@ -97,7 +126,7 @@ services:
 
 ```
 
-## Run example
+### Run example
 
 ``` bash
 docker run \
@@ -112,17 +141,17 @@ docker run \
   "ghcr.io/notifiarr/starrproxy:main"
 ```
 
-## Environment
+### Environment variables
 
-### Volumes
+#### Volumes
 
 Name: `App config`, Host: `/volume1/data/docker/starrproxy/config`, Container: `/config`
 
-### Ports
+#### Ports
 
 Inside: `80`, Outside: `9999`
 
-### Variables
+#### Variables
 
 Name: `TZ`, Key: `TZ`, Value: `America/New_York`
 
