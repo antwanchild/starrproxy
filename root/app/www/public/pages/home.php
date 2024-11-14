@@ -179,7 +179,7 @@ $getTotalUsageStats     = getTotalUsageStats($starrsTable, $appsTable, $usageTab
                                             <td><?= $starrAppApp['app'] ?></td>
                                             <td><?= $starrAppApp['endpoints'] ?></td>
                                             <td><?= $starrAppApp['template'] ?></td>
-                                            <td><i class="far fa-check-circle text-success" title="Match endpoints to template" style="cursor:pointer;" onclick="autoAdjustAppEndpoints(<?= $starrAppApp['id'] ?>)"></i></td>
+                                            <td><i class="far fa-check-circle text-success" title="Match endpoints to template" style="cursor:pointer;" onclick="viewAppEndpointDiff(<?= $starrAppApp['id'] ?>)"></i></td>
                                         </tr>
                                         <?php
                                     }

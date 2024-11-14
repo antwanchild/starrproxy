@@ -261,3 +261,83 @@ if ($_POST['m'] == 'autoAdjustAppEndpoints') {
         break;
     }
 }
+
+if ($_POST['m'] == 'viewAppEndpointDiff') {
+    $templateFile = $appEndpoints = $templateDiff = $appDiff = [];
+
+    foreach ($appsTable as $app) {
+        if ($app['id'] != $_POST['appId']) {
+            continue;
+        }
+
+        $templateFile   = file_exists($app['template']) ? $app['template'] : str_replace('../', './', $app['template']);
+        $templateFile   = getFile($templateFile);
+        $appEndpoints   = json_decode($app['endpoints'], true);
+
+        break;
+    }
+
+    $endpoints = [];
+    foreach ($templateFile as $templateEndpoint => $methods) {
+        foreach ($methods as $method) {
+            $endpoints[$templateEndpoint][$method][] = 'template';
+        }
+    }
+
+    foreach ($appEndpoints as $appEndpoint => $methods) {
+        foreach ($methods as $method) {
+            $endpoints[$appEndpoint][$method][] = 'app';
+        }
+    }
+
+    ?>
+    <div class="table-responsive">
+        <table class="table table-bordered table-hover">
+            <thead>
+                <tr>
+                    <th>Endpoint</th>
+                    <th>Method</th>
+                    <th>Template</th>
+                    <th>App</th>
+                </tr>
+            </thead>
+            <tbody>
+            <?php
+            foreach ($endpoints as $endpoint => $methods) {
+                foreach ($methods as $method => $matches) {
+                    ?>
+                    <tr>
+                        <td><?= $endpoint ?></td>
+                        <td><?= $method ?></td>
+                        <?php
+                        if (count($matches) == 2) {
+                            ?><td><i class="far fa-check-circle text-success"></i></td><?php
+                            ?><td><i class="far fa-check-circle text-success"></i></td><?php
+                        } else {
+                            if (in_array('template', $matches)) {
+                                ?><td><i class="far fa-check-circle text-success"></i></td><?php
+                            } else {
+                                ?><td><i class="far fa-times-circle text-danger"></i></td><?php
+                            }
+                            if (in_array('app', $matches)) {
+                                ?><td><i class="far fa-check-circle text-success"></i></td><?php
+                            } else {
+                                ?><td><i class="far fa-times-circle text-danger"></i></td><?php
+                            }
+                        }
+                        ?>
+                    </tr>
+                    <?php
+                }
+            }
+            ?>
+            </tbody>
+            <tfoot>
+                <tr>
+                    <td colspan="4" class="text-center"><button class="btn btn-success" onclick="autoAdjustAppEndpoints(<?= $_POST['appId'] ?>)">Match them</button></td>
+                </tr>
+            </tfoot>
+        </table>
+    </div>
+    <?php
+}

@@ -107,7 +107,7 @@ if (!$_SESSION['IN_UI']) {
                 $templateFile = file_exists($accessApp['template']) ? $accessApp['template'] : str_replace('../', './', $accessApp['template']);
                 if (file_exists($templateFile)) {
                     $templateEndpoints = getFile($templateFile);
-                    $template = ', <span ' . (count($accessApp['endpoints']) != count($templateEndpoints) ? 'class="text-warning" title="Template does not match, click to fix that" style="cursor: pointer;" onclick="autoAdjustAppEndpoints(' . $accessApp['id'] . ')"' : '') . '>Template: ' . count($templateEndpoints) . ' endpoint' . (count($templateEndpoints) == 1 ? '' : 's') . '</span>';
+                    $template = ', <span ' . (count($accessApp['endpoints']) != count($templateEndpoints) ? 'class="text-warning" title="Template does not match, click to fix that" style="cursor: pointer;" onclick="viewAppEndpointDiff(' . $accessApp['id'] . ')"' : '') . '>Template: ' . count($templateEndpoints) . ' endpoint' . (count($templateEndpoints) == 1 ? '' : 's') . '</span>';
                 }
                 ?>
                 <div class="col-sm-12 col-lg-3">

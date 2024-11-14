@@ -205,6 +205,28 @@ function addEndpointAccess(app, id, endpoint, method, endpointHash)
     });
 }
 // -------------------------------------------------------------------------------------------
+function viewAppEndpointDiff(appId)
+{
+    loadingStart();
+
+    $.ajax({
+        type: 'POST',
+        url: 'ajax/starr.php',
+        data: '&m=viewAppEndpointDiff&appId=' + appId,
+        success: function (resultData) {
+            dialogOpen({
+                id: 'viewAppEndpointDiff',
+                title: 'Template endpoint differences',
+                size: 'lg',
+                body: resultData,
+                onOpen: function() {
+                    loadingStop();
+                }
+            });
+        }
+    });
+}
+// -------------------------------------------------------------------------------------------
 function autoAdjustAppEndpoints(appId)
 {
     loadingStart();
