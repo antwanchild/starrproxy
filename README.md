@@ -42,8 +42,11 @@ There are some pre-built templates that enable just the api access the app actua
 - Notifiarr
 - Omegabrr
 - Overseerr
-- Recyclarr
+- Recyclarr\*
+- TitleCardMaker
 - Unpackerr
+
+\* Has a requirement of unique URLs for each app, this means you will need to add a fake base to the url. Example: `http://10.1.0.100:9090/radarr1`
 
 ## Automation
 
