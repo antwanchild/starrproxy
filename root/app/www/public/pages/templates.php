@@ -19,7 +19,7 @@ $templateList = getTemplateList();
 ?>
 
 <div class="row p3">
-    <div class="col-sm-1">
+    <div class="col-sm-2">
     <?php
     $index = 0;
     foreach ($templateList as $app => $appTemplates) {
@@ -30,8 +30,12 @@ $templateList = getTemplateList();
             ?>
             <ul style="margin-bottom: 0px; padding-bottom: 0px;">
                 <li class="app-index-<?= $index ?>">
-                    <span style="cursor: pointer;" onclick="viewTemplate('<?= $appTemplate['location'] . $appTemplate['starr'] ?>/<?= $app ?>.json', <?= $index ?>)"><?= $appTemplate['starr'] ?></span>
-                    <?= $custom ? ' <i class="far fa-user text-warning" title="Custom user template"></i> <i class="far fa-trash-alt text-danger" title="Delete custom template" style="cursor:pointer;" onclick="deleteCustomTemplate(\'' . $app . '\', \'' . $appTemplate['starr'] . '\')"></i>' : '' ?>
+                    <?php if (TEMPLATE_ORDER == 1) { ?>
+                        <span style="cursor: pointer;" onclick="viewTemplate('<?= $appTemplate['location'] . $appTemplate['item'] ?>/<?= $app ?>.json', <?= $index ?>)"><?= $appTemplate['item'] ?></span>
+                    <?php } elseif (TEMPLATE_ORDER == 2) { ?>
+                        <span style="cursor: pointer;" onclick="viewTemplate('<?= $appTemplate['location'] . $app ?>/<?= $appTemplate['item'] ?>.json', <?= $index ?>)"><?= $appTemplate['item'] ?></span>
+                    <?php } ?>
+                    <?= $custom ? ' <i class="far fa-user text-warning" title="Custom user template"></i> <i class="far fa-trash-alt text-danger" title="Delete custom template" style="cursor:pointer;" onclick="deleteCustomTemplate(\'' . $app . '\', \'' . $appTemplate['item'] . '\')"></i>' : '' ?>
                 </li>
             </ul>
             <?php
@@ -39,7 +43,7 @@ $templateList = getTemplateList();
     }
     ?>
     </div>
-    <div class="col-sm-11">
+    <div class="col-sm-10">
         <div id="template-viewer" class="mt-3"></div>
     </div>
 </div>

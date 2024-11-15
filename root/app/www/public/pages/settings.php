@@ -60,6 +60,11 @@ closedir($dir);
             <div class="card-body">
                 <div class="table-responsive">
                     <table class="table table-bordered table-hover">
+                        <thead>
+                            <tr>
+                                <th colspan="2">Navigation</th>
+                            </tr>
+                        </thead>
                         <tbody>
                             <?php
                             foreach (StarrApps::LIST as $index => $starrApp) {
@@ -96,6 +101,20 @@ closedir($dir);
                                 </td>
                             </tr>
                         </tbody>
+                        <thead>
+                            <tr>
+                                <th colspan="2">Templates</th>
+                            </tr>
+                            <tr>
+                                <td class="w-25">Order</td>
+                                <td>
+                                    <select id="setting-templateOrder" class="form-select w-50">
+                                        <option <?= $settingsTable['templateOrder'] == 1 ? 'selected ' : '' ?>value="1">Group by app</option>
+                                        <option <?= $settingsTable['templateOrder'] == 2 ? 'selected ' : '' ?>value="2">Group by starr</option>
+                                    </select>
+                                </td>
+                            </tr>
+                        </thead>
                     </table>
                     <br>** Refresh the page after changing UI settings
                 </div>

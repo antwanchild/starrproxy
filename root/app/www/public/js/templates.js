@@ -1,5 +1,7 @@
 function viewTemplate(template, index)
 {
+    loadingStart();
+
     $('[class^=app-index-]').removeClass('text-info');
     $('.app-index-' + index).addClass('text-info');
 
@@ -9,6 +11,7 @@ function viewTemplate(template, index)
         data: '&m=viewTemplate&template=' + template,
         success: function (resultData) {
             $('#template-viewer').html(resultData)
+            loadingStop();
         }
     });
 }
@@ -46,13 +49,13 @@ function applyTemplateOptions()
     });
 }
 // ---------------------------------------------------------------------------------------------
-function deleteCustomTemplate(app, starr)
+function deleteCustomTemplate(app, item)
 {
     if (confirm('Are you sure you want to delete this template?')) {
         $.ajax({
             type: 'POST',
             url: 'ajax/templates.php',
-            data: '&m=deleteCustomTemplate&app=' + app + '&starr=' + starr,
+            data: '&m=deleteCustomTemplate&app=' + app + '&item=' + item,
             success: function () {
                 reload();
             }

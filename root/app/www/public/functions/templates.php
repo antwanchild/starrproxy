@@ -17,7 +17,12 @@ function getTemplateOptions()
 
         foreach ($appTemplates as $appTemplate) {
             $custom = str_contains($appTemplate['location'], APP_USER_TEMPLATES_PATH);
-            $templateOptions .= '<option value="' . $appTemplate['location'] . $appTemplate['starr'] . '/' . $app . '.json">' . $appTemplate['starr'] . ($custom ? ' [Custom]' : '') . '</option>';
+
+            if (TEMPLATE_ORDER == 1) {
+                $templateOptions .= '<option value="' . $appTemplate['location'] . $appTemplate['item'] . '/' . $app . '.json">' . $appTemplate['item'] . ($custom ? ' [Custom]' : '') . '</option>';
+            } elseif (TEMPLATE_ORDER == 2) {
+                $templateOptions .= '<option value="' . $appTemplate['location'] . $app . '/' . $appTemplate['item'] . '.json">' . $appTemplate['item'] . ($custom ? ' [Custom]' : '') . '</option>';                
+            }
         }
         $templateOptions .= '</optgroup>';
     }
@@ -39,7 +44,11 @@ function getTemplateList()
                     }
             
                     $template = str_replace('.json', '', $template);
-                    $list[$template][] = ['location' => $templateLocation, 'starr' => $starrApp];
+                    if (TEMPLATE_ORDER == 1) {
+                        $list[$template][] = ['location' => $templateLocation, 'item' => $starrApp];
+                    } elseif (TEMPLATE_ORDER == 2) {
+                        $list[$starrApp][] = ['location' => $templateLocation, 'item' => $template];
+                    }
                 }
                 closedir($dir);
                 ksort($list);

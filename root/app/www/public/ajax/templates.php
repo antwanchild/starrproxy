@@ -58,5 +58,9 @@ if ($_POST['m'] == 'applyTemplateOptions') {
 }
 
 if ($_POST['m'] == 'deleteCustomTemplate') {
-    unlink(APP_USER_TEMPLATES_PATH . $_POST['starr'] . '/' . $_POST['app'] . '.json');
+    if (TEMPLATE_ORDER == 1) {
+        unlink(APP_USER_TEMPLATES_PATH . $_POST['item'] . '/' . $_POST['app'] . '.json');
+    } elseif (TEMPLATE_ORDER == 2) {
+        unlink(APP_USER_TEMPLATES_PATH . $_POST['app'] . '/' . $_POST['item'] . '.json');
+    }
 }

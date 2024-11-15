@@ -91,3 +91,5 @@ if (!$usageTable && ($app || !$page || $page == 'home')) {
 define('LOG_ROTATE_SIZE', $settingsTable['logRotationSize'] ?: $LOG_ROTATE_SIZE);
 define('LOG_AGE', $settingsTable['logRetentionLength'] ?: $LOG_AGE);
 define('BACKUP_AGE', $settingsTable['backupRetentionLength'] ?: $BACKUP_AGE);
+
+define('TEMPLATE_ORDER', $settingsTable['templateOrder'] ?: 1);
