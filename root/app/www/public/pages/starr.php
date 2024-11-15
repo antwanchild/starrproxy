@@ -17,7 +17,7 @@ if (!$_SESSION['IN_UI']) {
 ?>
 
 <div class="col-sm-12">
-    <h4><?= $appLabel ?> instances</h4>
+    <h4 class="text-light"><?= $appLabel ?> instance management</h4>
     <div class="table-responsive">
         <table class="table table-bordered" style="min-width: 750px;" align="center">
             <thead>
@@ -88,7 +88,7 @@ if (!$_SESSION['IN_UI']) {
     </div>
 </div>
 <div class="col-sm-12">
-    <h4>3<sup>rd</sup> party app access</h4>
+    <h4 class="text-light">3<sup>rd</sup> party app management</h4>
     <br>You will use <code id="proxyUrl"><?= APP_URL ?></code> <i class="far fa-copy text-info" style="cursor: pointer;" onclick="clipboard('proxyUrl', 'html')" title="Copy apikey to clipboard"></i> as the <?= ucfirst($app) ?> url in the 3<sup>rd</sup> party app and copy the apikey below<br><br>
     <div class="row">
         <?php
@@ -152,12 +152,16 @@ if (!$_SESSION['IN_UI']) {
         <div class="col-sm-12 col-lg-3">
             <div class="card border-secondary mb-3">
                 <div class="card-header">New app</div>
-                <div class="card-body" style="cursor: pointer;" onclick="openAppStarrAccess('<?= $app ?>', 99)">
-                    <h5 class="card-title">Give an external app/script access to a radarr instance</h5>
+                <?php if ($starrsTable) { ?>
+                    <div class="card-body" style="cursor: pointer;" onclick="openAppStarrAccess('<?= $app ?>', 99)">
+                    <h5 class="card-title">Give an external app/script access to a <?= ucfirst($app) ?> instance</h5>
                     <center>
                         <i class="text-info far fa-plus-square fa-5x"></i>
                     </center>
                 </div>
+                <?php } else { ?>
+                    <div class="m-2">Add some <?= $app ?> instances above so you can assign apps to them</div>
+                <?php } ?>
             </div>
         </div>
     </div>
