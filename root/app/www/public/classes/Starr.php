@@ -128,8 +128,8 @@ class Starr
 
                     if ($endpointOverrides) {
                         foreach ($endpointOverrides as $endpointMethod) {
-                            if (!in_array($endpointMethod, $endpointInfo['methods'])) {
-                                $endpointInfo['methods'][] = $endpointMethod;
+                            if (!in_array($endpointMethod . '*', $endpointInfo['methods'])) {
+                                $endpointInfo['methods'][] = $endpointMethod . '*';
                             }
                         }
                     }
@@ -138,6 +138,7 @@ class Starr
     
             if ($endpointInfo) {
                 $endpoints[$endpoint] = $endpointInfo;
+                sort($endpoints[$endpoint]['methods']);
             }
         }
     
