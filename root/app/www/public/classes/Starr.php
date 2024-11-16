@@ -12,6 +12,8 @@ loadClassExtras('Starr');
 
 class Starr
 {
+    use Overrides;
+
     public function __construct()
     {
 
@@ -104,8 +106,9 @@ class Starr
                 break;
         }
     
-        $openapi = curl($openapi);
-    
+        $openapi    = curl($openapi);
+        $overrides  = $this->endpointOverrides($app);
+
         foreach ($openapi['response']['paths'] as $endpoint => $endpointData) {
             if (str_equals_any($endpoint, ['/', '/{path}'])) {
                 continue;
@@ -119,6 +122,18 @@ class Starr
     
                 $endpointInfo['label'] = $methodParams['tags'][0];
                 $endpointInfo['methods'][] = $method;
+
+                if ($overrides) {
+                    $endpointOverrides = $overrides[$endpoint];
+
+                    if ($endpointOverrides) {
+                        foreach ($endpointOverrides as $endpointMethod) {
+                            if (!in_array($endpointMethod, $endpointInfo['methods'])) {
+                                $endpointInfo['methods'][] = $endpointMethod;
+                            }
+                        }
+                    }
+                }
             }
     
             if ($endpointInfo) {
