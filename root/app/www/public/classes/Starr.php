@@ -251,7 +251,10 @@ class Starr
                     }
 
                     if ($accessMatches[1] == $requestMatches[1] . '/') {
-                        if (count($accessMatches) == count($requestMatches)) {
+                        $requestEndpointParts   = explode('/', $endpoint);
+                        $starrEndpointParts     = explode('/', $accessEndpoint);
+    
+                        if (count($accessMatches) == count($requestMatches) && count($starrEndpointParts) == count($requestEndpointParts)) {
                             return $accessEndpoint;
                         }
                     }
