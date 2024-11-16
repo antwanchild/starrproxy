@@ -201,7 +201,7 @@ function getLog($logfile, $page = 1, $app = false)
 
                         ?>
                         <i id="disallowed-endpoint-<?= md5($endpoint.$method) ?>" class="far fa-times-circle text-danger" title="Disallowed endpoint, click to allow it" style="display: <?= !$accessMethod ? 'inline-block' : 'none' ?>; cursor: pointer;" onclick="addEndpointAccess('<?= $app ?>', <?= $proxiedApp['proxiedAppDetails']['id'] ?>, '<?= $endpoint ?>', '<?= $method ?>', '<?= md5($endpoint.$method) ?>')"></i> 
-                        <i id="allowed-endpoint-<?= md5($endpoint.$method) ?>" class="far fa-check-circle text-success" title="Allowed endpoint" style="display: <?= $accessMethod ? 'inline-block' : 'none' ?>;"></i>
+                        <i id="allowed-endpoint-<?= md5($endpoint.$method) ?>" class="far fa-check-circle text-success" title="Allowed endpoint, click to block it" style="display: <?= $accessMethod ? 'inline-block' : 'none' ?>; cursor: pointer;" onclick="removeEndpointAccess('<?= $app ?>', <?= $proxiedApp['proxiedAppDetails']['id'] ?>, '<?= $endpoint ?>', '<?= $method ?>', '<?= md5($endpoint.$method) ?>')"></i> 
                         [<?= strtoupper($method) ?>] <?= ($accessEndpoint != $endpoint ? $accessEndpoint . ' → ' : '') . $endpoint . ': ' . number_format($usage) ?> hit<?= $usage == 1 ? '' : 's' ?><br>
                         <?php
                     }
