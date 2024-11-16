@@ -169,8 +169,12 @@ if ($internalEndpoint) {
             readfile($proxyBackup);
         }
     } else {
-        if ($accessEndpoint = $starr->isAllowedEndpoint($proxiedApp['access'], $endpoint)) {
-            $endpoint = $accessEndpoint;
+        $isAllowedEndpoint  = $starr->isAllowedEndpoint($proxiedApp['access'], $endpoint);
+        $starrEndpoint      = $isAllowedEndpoint['starrEndpoint'];
+        $isAllowed          = $isAllowedEndpoint['allowed'];
+
+        if ($isAllowed) {
+            $endpoint = $starrEndpoint;
         } else {
             logger($logfile, $apikey, $endpoint, 401);
             logger(str_replace('access.log', 'access_' . $proxiedApp['proxiedAppDetails']['name'] . '.log', $logfile), $apikey, $endpoint, 401);
