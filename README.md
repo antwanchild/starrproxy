@@ -39,6 +39,7 @@ There are some pre-built templates that enable just the api access the app actua
 - Homepage
 - Jellyseerr
 - Kometa
+- LunaSea
 - Nabarr
 - Notifiarr
 - Omegabrr
