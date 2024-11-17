@@ -255,6 +255,18 @@ class Starr
                     }
 
                     if ($accessMatches[1] == $requestMatches[1] . '/') {
+                        $invalidType = false;
+                        foreach ($accessMatches as $accessIndex => $accessMatch) {
+                            if (str_equals_any($accessMatch, ['{id}', '{seriesId}', '{movieId}']) && !is_numeric($requestMatches[$accessIndex])) {
+                                $invalidType = true;
+                                break;
+                            }
+                        }
+
+                        if ($invalidType) {
+                            continue;
+                        }
+
                         $requestEndpointParts   = explode('/', $endpoint);
                         $starrEndpointParts     = explode('/', $accessEndpoint);
     
