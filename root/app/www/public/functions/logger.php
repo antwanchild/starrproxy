@@ -176,7 +176,8 @@ function getLog($logfile, $page = 1, $app = false)
                         preg_match('/endpoint:(.*);/U', $line, $endpointMatch);
                         preg_match('/method:(.*);/U', $line, $methodMatch);
                         if ($endpointMatch[1]) {
-                            $endpointUsage[$endpointMatch[1]][$methodMatch[1]]++;
+                            $endpoint = rtrim($endpointMatch[1], '/');
+                            $endpointUsage[$endpoint][$methodMatch[1]]++;
                         }
 
                         ?><tr><td><?= $error . $line ?></td></tr><?php
