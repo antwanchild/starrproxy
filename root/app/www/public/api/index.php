@@ -37,6 +37,7 @@ $method             = strtolower($_SERVER['REQUEST_METHOD']);
 $json               = file_get_contents('php://input');
 $internalEndpoint   = str_equals_any($endpoint, ['/api/addstarr', '/api/proxystats']) ? true : false;
 $apikey             = $_GET['apikey'] ?: $_SERVER['HTTP_X_API_KEY'];
+$endpoint           = rtrim($endpoint, '/');
 
 if (!$apikey) {
     logger($logfile, $apikey, null, 401);
