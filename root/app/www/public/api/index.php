@@ -153,6 +153,7 @@ if ($internalEndpoint) {
     apiResponse($code, $response);
 } else {
     $proxiedApp = $starr->getAppFromProxiedKey($apikey);
+    $app        = $starr->getStarrInterfaceNameFromId($proxiedApp['starrAppDetails']['starr']);
 
     if (!$proxiedApp) {
         logger($logfile, $apikey, $endpoint, 401);
@@ -169,7 +170,7 @@ if ($internalEndpoint) {
             readfile($proxyBackup);
         }
     } else {
-        $isAllowedEndpoint  = $starr->isAllowedEndpoint($proxiedApp['access'], $endpoint);
+        $isAllowedEndpoint  = $starr->isAllowedEndpoint($app, $proxiedApp['access'], $endpoint);
         $starrEndpoint      = $isAllowedEndpoint['starrEndpoint'];
         $isAllowed          = $isAllowedEndpoint['allowed'];
 

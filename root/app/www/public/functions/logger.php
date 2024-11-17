@@ -189,12 +189,14 @@ function getLog($logfile, $page = 1, $app = false)
         <?php 
         if ($app) {
             $proxiedApp = $starr->getAppFromProxiedKey($_POST['key'], true);
+            $starrApp   = $starr->getStarrInterfaceNameFromId($proxiedApp['starrAppDetails']['starr']);
+
             ?>
             <div class="tab-pane fade" id="endpoints" role="tabpanel">
                 <h4>Endpoint usage <span class="text-small">(<?= count($endpointUsage) ?> endpoint<?= count($endpointUsage) == 1 ? '' : 's' ?>)</span></h4>
                 <?php
                 foreach ($endpointUsage as $endpoint => $methods) {
-                    $isAllowedEndpoint  = $starr->isAllowedEndpoint($proxiedApp['access'], $endpoint);
+                    $isAllowedEndpoint  = $starr->isAllowedEndpoint($starrApp, $proxiedApp['access'], $endpoint);
                     $starrEndpoint      = $isAllowedEndpoint['starrEndpoint'];
                     $isAllowed          = $isAllowedEndpoint['allowed'];
 
@@ -202,9 +204,9 @@ function getLog($logfile, $page = 1, $app = false)
                         $isAllowedEndpointMethod = $isAllowed ? $starr->isAllowedEndpointMethod($proxiedApp['access'], $starrEndpoint, $method) : false;
 
                         ?>
-                        <i id="disallowed-endpoint-<?= md5($starrEndpoint.$method) ?>" class="far fa-times-circle text-danger" title="Disallowed endpoint, click to allow it" style="display: <?= !$isAllowedEndpointMethod ? 'inline-block' : 'none' ?>; cursor: pointer;" onclick="addEndpointAccess('<?= $app ?>', <?= $proxiedApp['proxiedAppDetails']['id'] ?>, '<?= $starrEndpoint ?>', '<?= $method ?>', '<?= md5($starrEndpoint.$method) ?>')"></i> 
-                        <i id="allowed-endpoint-<?= md5($starrEndpoint.$method) ?>" class="far fa-check-circle text-success" title="Allowed endpoint, click to block it" style="display: <?= $isAllowedEndpointMethod ? 'inline-block' : 'none' ?>; cursor: pointer;" onclick="removeEndpointAccess('<?= $app ?>', <?= $proxiedApp['proxiedAppDetails']['id'] ?>, '<?= $starrEndpoint ?>', '<?= $method ?>', '<?= md5($starrEndpoint.$method) ?>')"></i> 
-                        [<?= strtoupper($method) ?>] <?= ($starrEndpoint != $endpoint ? $starrEndpoint . ' → ' : '') . $endpoint . ': ' . number_format($usage) ?> hit<?= $usage == 1 ? '' : 's' ?><br>
+                        <i id="disallowed-endpoint-<?= md5($starrEndpoint.$method) ?>" class="far fa-times-circle text-danger" title="Disallowed endpoint, click to allow it" style="display: <?= !$isAllowedEndpointMethod ? 'inline-block' : 'none' ?>; cursor: pointer;" onclick="addEndpointAccess('<?= $app ?>', <?= $proxiedApp['proxiedAppDetails']['id'] ?>, '<?= $starrEndpoint ?: $endpoint ?>', '<?= $method ?>', '<?= md5($starrEndpoint.$method) ?>')"></i> 
+                        <i id="allowed-endpoint-<?= md5($starrEndpoint.$method) ?>" class="far fa-check-circle text-success" title="Allowed endpoint, click to block it" style="display: <?= $isAllowedEndpointMethod ? 'inline-block' : 'none' ?>; cursor: pointer;" onclick="removeEndpointAccess('<?= $app ?>', <?= $proxiedApp['proxiedAppDetails']['id'] ?>, '<?= $starrEndpoint ?: $endpoint ?>', '<?= $method ?>', '<?= md5($starrEndpoint.$method) ?>')"></i> 
+                        [<?= strtoupper($method) ?>] <?= ($starrEndpoint && $starrEndpoint != $endpoint ? $starrEndpoint . ' → ' : '') . $endpoint . ': ' . number_format($usage) ?> hit<?= $usage == 1 ? '' : 's' ?><br>
                         <?php
                     }
                 }

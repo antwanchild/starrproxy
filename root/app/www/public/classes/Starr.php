@@ -228,9 +228,13 @@ class Starr
         return [];
     }
 
-    public function findWildcardEndpoint($endpoint)
+    public function findWildcardEndpoint($starrApp, $endpoint)
     {
-        foreach (StarrApps::LIST as $starrApp) {
+        foreach (StarrApps::LIST as $listStarr) {
+            if (strtolower($listStarr) != strtolower($starrApp)) {
+                continue;
+            }
+
             $endpoints = $this->getEndpoints(strtolower($starrApp));
 
             $endpointRegexes    = ['/(.*)\/(.*)\/(.*)/', '/(.*)\/(.*)/'];
@@ -265,9 +269,9 @@ class Starr
         return;
     }
 
-    public function isAllowedEndpoint($endpoints, $endpoint)
+    public function isAllowedEndpoint($starrApp, $endpoints, $endpoint)
     {
-        if (!$endpoint) {
+        if (!$starrApp || !$endpoint) {
             return ['allowed' => false];
         }
 
@@ -279,7 +283,7 @@ class Starr
 
         // CHECK IF THE ENDPOINT HAS WILDCARDS: /{...}/{...} OR /{...}
         if (!$endpoints[$endpoint]) {
-            $wildcard = $this->findWildcardEndpoint($endpoint);
+            $wildcard = $this->findWildcardEndpoint($starrApp, $endpoint);
             return ['allowed' => $endpoints[$wildcard], 'starrEndpoint' => $wildcard];
         }
 
