@@ -15,8 +15,12 @@ RUN \
   grep -qxF 'clear_env = no' /etc/php82/php-fpm.d/www.conf || echo 'clear_env = no' >> /etc/php82/php-fpm.d/www.conf && \
   echo "env[PATH] = /usr/local/bin:/usr/bin:/bin" >> /etc/php82/php-fpm.conf
 
-  # install sqlite3
-RUN apk add --no-cache php82-sqlite3
+RUN apk --no-cache add \ 
+    # Database
+    php82-sqlite3 \ 
+    # Memcache
+    memcached \ 
+    php82-pecl-memcached
 
 # healthchecks
 HEALTHCHECK --interval=60s --timeout=30s --start-period=180s --start-interval=10s --retries=5 \
