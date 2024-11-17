@@ -201,11 +201,12 @@ function getLog($logfile, $page = 1, $app = false)
                     $isAllowed          = $isAllowedEndpoint['allowed'];
 
                     foreach ($methods as $method => $usage) {
-                        $isAllowedEndpointMethod = $isAllowed ? $starr->isAllowedEndpointMethod($proxiedApp['access'], $starrEndpoint, $method) : false;
+                        $isAllowedEndpointMethod    = $isAllowed ? $starr->isAllowedEndpointMethod($proxiedApp['access'], $starrEndpoint, $method) : false;
+                        $hash                       = md5(($starrEndpoint && $starrEndpoint != $endpoint ? $starrEndpoint : $endpoint).$method);
 
                         ?>
-                        <i id="disallowed-endpoint-<?= md5($starrEndpoint.$method) ?>" class="far fa-times-circle text-danger" title="Disallowed endpoint, click to allow it" style="display: <?= !$isAllowedEndpointMethod ? 'inline-block' : 'none' ?>; cursor: pointer;" onclick="addEndpointAccess('<?= $app ?>', <?= $proxiedApp['proxiedAppDetails']['id'] ?>, '<?= $starrEndpoint ?: $endpoint ?>', '<?= $method ?>', '<?= md5($starrEndpoint.$method) ?>')"></i> 
-                        <i id="allowed-endpoint-<?= md5($starrEndpoint.$method) ?>" class="far fa-check-circle text-success" title="Allowed endpoint, click to block it" style="display: <?= $isAllowedEndpointMethod ? 'inline-block' : 'none' ?>; cursor: pointer;" onclick="removeEndpointAccess('<?= $app ?>', <?= $proxiedApp['proxiedAppDetails']['id'] ?>, '<?= $starrEndpoint ?: $endpoint ?>', '<?= $method ?>', '<?= md5($starrEndpoint.$method) ?>')"></i> 
+                        <i id="disallowed-endpoint-<?= $hash ?>" class="far fa-times-circle text-danger" title="Disallowed endpoint, click to allow it" style="display: <?= !$isAllowedEndpointMethod ? 'inline-block' : 'none' ?>; cursor: pointer;" onclick="addEndpointAccess('<?= $app ?>', <?= $proxiedApp['proxiedAppDetails']['id'] ?>, '<?= $starrEndpoint ?: $endpoint ?>', '<?= $method ?>', '<?= $hash ?>')"></i> 
+                        <i id="allowed-endpoint-<?= $hash ?>" class="far fa-check-circle text-success" title="Allowed endpoint, click to block it" style="display: <?= $isAllowedEndpointMethod ? 'inline-block' : 'none' ?>; cursor: pointer;" onclick="removeEndpointAccess('<?= $app ?>', <?= $proxiedApp['proxiedAppDetails']['id'] ?>, '<?= $starrEndpoint ?: $endpoint ?>', '<?= $method ?>', '<?= $hash ?>')"></i> 
                         [<?= strtoupper($method) ?>] <?= ($starrEndpoint && $starrEndpoint != $endpoint ? $starrEndpoint . ' → ' : '') . $endpoint . ': ' . number_format($usage) ?> hit<?= $usage == 1 ? '' : 's' ?><br>
                         <?php
                     }
