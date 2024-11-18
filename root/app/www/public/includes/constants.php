@@ -44,3 +44,11 @@ define('SYSTEM_LOG', LOGS_PATH . 'system/app.log');
 define('MIGRATION_LOG', LOGS_PATH . 'system/migrations.log');
 define('CRON_HOUSEKEEPER_LOG', LOGS_PATH . 'system/cron-housekeeper.log');
 define('LOG_LINES_PER_PAGE', 1000);
+
+//-- CACHE
+define('STARRS_TABLE_CACHE_KEY', 'starr_table');
+define('STARRS_TABLE_CACHE_TIME', 86400); //-- 1 DAY
+define('APPS_TABLE_CACHE_KEY', 'apps_table');
+define('APPS_TABLE_CACHE_TIME', 86400); //-- 1 DAY
+define('STARR_ENDPOINT_LIST_KEY', 'endpoints_%s'); //-- _starrApp
+define('STARR_ENDPOINT_LIST_TIME', 604800); //-- 1 WEEK

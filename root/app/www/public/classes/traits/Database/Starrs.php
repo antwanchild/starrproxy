@@ -13,12 +13,22 @@ trait Starrs
     {
         $starrs = [];
 
-        $q = "SELECT *
-              FROM " . STARRS_TABLE . "
-              ORDER BY name ASC";
-        $r = $this->query($q);
-        while ($row = $this->fetchAssoc($r)) {
-            $starrs[] = $row;
+        $starrsTableCache = $this->cache->get(STARRS_TABLE_CACHE_KEY);
+
+        if ($starrsTableCache) {
+            $starrs = json_decode($starrsTableCache, true);
+        }
+
+        if (empty($starrs)) {
+            $q = "SELECT *
+                  FROM " . STARRS_TABLE . "
+                  ORDER BY name ASC";
+            $r = $this->query($q);
+            while ($row = $this->fetchAssoc($r)) {
+                $starrs[] = $row;
+            }
+
+            $this->cache->set(STARRS_TABLE_CACHE_KEY, json_encode($starrs), STARRS_TABLE_CACHE_TIME);
         }
 
         return $starrs;
@@ -26,7 +36,7 @@ trait Starrs
 
     public function getStarrAppFromId($id, $starrsTable)
     {
-        $starrsTable ??= $this->getStarrsTable();
+        $starrsTable = $starrsTable ?: $this->getStarrsTable();
 
         foreach ($starrsTable as $starrApp) {
             if ($starrApp['id'] == $id) {
@@ -47,6 +57,8 @@ trait Starrs
             return $this->error();
         }
 
+        $this->cache->bust(STARRS_TABLE_CACHE_KEY);
+
         return;
     }
 
@@ -62,6 +74,8 @@ trait Starrs
             return $this->error();
         }
 
+        $this->cache->bust(STARRS_TABLE_CACHE_KEY);
+
         return;
     }
 
@@ -75,6 +89,8 @@ trait Starrs
         if ($this->error() != 'not an error') {
             return $this->error();
         }
+
+        $this->cache->bust(STARRS_TABLE_CACHE_KEY);
 
         return;
     }
@@ -91,6 +107,8 @@ trait Starrs
         if ($this->error() != 'not an error') {
             return $this->error();
         }
+
+        $this->cache->bust(STARRS_TABLE_CACHE_KEY);
 
         return;
     }

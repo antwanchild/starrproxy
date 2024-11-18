@@ -14,9 +14,13 @@ class Starr
 {
     use Overrides;
 
+    public $cache;
+
     public function __construct()
     {
+        global $cache;
 
+        $this->cache = $cache ?: new Cache();
     }
 
     public function __tostring()
@@ -85,6 +89,13 @@ class Starr
 
     public function getEndpoints($app)
     {
+        $cacheKey   = sprintf(STARR_ENDPOINT_LIST_KEY, $app);
+        $cache      = $this->cache->get($cacheKey);
+
+        if ($cache) {
+            return json_decode($cache, true);
+        }
+
         switch ($app) {
             case 'lidarr':
                 $openapi = 'https://raw.githubusercontent.com/lidarr/Lidarr/develop/src/Lidarr.Api.V1/openapi.json';
@@ -142,6 +153,8 @@ class Starr
             }
         }
     
+        $this->cache->set($cacheKey, json_encode($endpoints), STARR_ENDPOINT_LIST_TIME);
+
         return $endpoints;
     }
 
@@ -183,9 +196,9 @@ class Starr
     {
         global $proxyDb, $appsTable, $starrsTable;
 
-        $proxyDb ??= new Database(PROXY_DATABASE_NAME);
-        $starrsTable ??= $proxyDb->getStarrsTable();
-        $appsTable ??= $proxyDb->getAppsTable();
+        $proxyDb        = $proxyDb ?: new Database(PROXY_DATABASE_NAME);
+        $starrsTable    = $starrsTable ?: $proxyDb->getStarrsTable();
+        $appsTable      = $appsTable ?: $proxyDb->getAppsTable();
 
         $access = $starrAppDetails = $proxiedAppDetails = [];
 
@@ -216,8 +229,8 @@ class Starr
     {    
         global $proxyDb;
 
-        $proxyDb ??= new Database(PROXY_DATABASE_NAME);
-        $starrsTable ??= $proxyDb->getStarrsTable();
+        $proxyDb = $proxyDb ?: new Database(PROXY_DATABASE_NAME);
+        $starrsTable = $starrsTable ?: $proxyDb->getStarrsTable();
 
         foreach ($starrsTable as $starrApp) {    
             if ($starrApp['apikey'] == $apikey) {

@@ -28,13 +28,16 @@ class Database
     public $notificationLinkTable;
     public $starr;
     public $shell;
+    public $cache;
 
     public function __construct($dbName)
     {
+        global $starr, $shell, $cache;
         $this->connect(DATABASE_PATH . $dbName);
         $this->dbName = $dbName;
-        $this->starr = new Starr();
-        $this->shell = new Shell();
+        $this->starr = $starr ?: new Starr();
+        $this->shell = $shell ?: new Shell();
+        $this->cache = $cache ?: new Cache();
     }
 
     public function connect($dbFile)

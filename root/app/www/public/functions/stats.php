@@ -30,22 +30,23 @@ function getTotalEndpointStats($starrsTable, $appsTable)
 {
     global $starr;
 
-    $starr ??= new Starr();
-    $stats = [];
+    $starr = $starr ?: new Starr();
+    $stats = $endpointList = [];
 
     if ($starrsTable) {
         foreach ($starrsTable as $starrApp) {
-            $app            = $starr->getStarrInterfaceNameFromId($starrApp['starr']);
-            $allowed        = 0;
-            $total          = 0;
-            $apps           = 0;
-            $totalEndpoints = $starr->getEndpoints($app);
+            $app        = $starr->getStarrInterfaceNameFromId($starrApp['starr']);
+            $allowed    = $total = $apps = 0;
+
+            if (!$endpointList[$app]) {
+                $endpointList[$app] = $starr->getEndpoints($app);
+            }
 
             foreach ($appsTable as $proxiedApp) {
                 if ($proxiedApp['starr_id'] == $starrApp['id']) {
                     $endpoints  = json_decode($proxiedApp['endpoints'], true);
                     $allowed    += count($endpoints);
-                    $total      += count($totalEndpoints);
+                    $total      += count($endpointList[$app]);
                     $apps++;
                 }
             }

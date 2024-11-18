@@ -49,6 +49,9 @@ foreach ($autoloads as $autoload) {
     }
 }
 
+//-- INITIALIZE THE CACHE CLASS
+$cache = new Cache();
+
 //-- INITIALIZE THE SHELL CLASS
 $shell = new Shell();
 

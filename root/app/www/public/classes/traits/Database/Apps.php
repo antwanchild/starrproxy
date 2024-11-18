@@ -13,12 +13,22 @@ trait Apps
     {
         $apps = [];
 
-        $q = "SELECT *
-              FROM " . APPS_TABLE . "
-              ORDER BY name ASC";
-        $r = $this->query($q);
-        while ($row = $this->fetchAssoc($r)) {
-            $apps[] = $row;
+        $appsTableCache = $this->cache->get(APPS_TABLE_CACHE_KEY);
+
+        if ($appsTableCache) {
+            $apps = json_decode($appsTableCache, true);
+        }
+
+        if (empty($apps)) {
+            $q = "SELECT *
+                  FROM " . APPS_TABLE . "
+                  ORDER BY name ASC";
+            $r = $this->query($q);
+            while ($row = $this->fetchAssoc($r)) {
+                $apps[] = $row;
+            }
+
+            $this->cache->set(APPS_TABLE_CACHE_KEY, json_encode($apps), APPS_TABLE_CACHE_TIME);
         }
 
         return $apps;
@@ -26,7 +36,7 @@ trait Apps
 
     public function getAppFromId($appId, $appsTable)
     {
-        $appsTable ??= $this->getAppsTable();
+        $appsTable = $appsTable ?: $this->getAppsTable();
 
         foreach ($appsTable as $app) {
             if ($app['id'] == $appId) {
@@ -58,6 +68,8 @@ trait Apps
             return $this->error();
         }
 
+        $this->cache->bust(APPS_TABLE_CACHE_KEY);
+
         return;
     }
 
@@ -81,6 +93,8 @@ trait Apps
             return $this->error();
         }
 
+        $this->cache->bust(APPS_TABLE_CACHE_KEY);
+
         return;
     }
 
@@ -93,6 +107,8 @@ trait Apps
         if ($this->error() != 'not an error') {
             return $this->error();
         }
+
+        $this->cache->bust(APPS_TABLE_CACHE_KEY);
 
         return;
     }
