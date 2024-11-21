@@ -13,12 +13,13 @@ function logger($logfile, $apikey = '', $endpoint = '', $proxyCode = 200, $starr
         return;
     }
 
-    if (str_equals_any($logfile, [MIGRATION_LOG, SYSTEM_LOG]) || str_contains_any($logfile, ['notifications/'])) {
-        file_put_contents($logfile, date('c') . ' ' . $apikey . "\n", FILE_APPEND);
+    $date = date(sprintf('Y-m-d\TH:i:s%s', substr(microtime(), 1, 8)));
+    if (str_equals_any($logfile, [MIGRATION_LOG, SYSTEM_LOG]) || str_contains_any($logfile, ['notifications/']) || $proxyCode == 999) {
+        file_put_contents($logfile, $date . ' ' . $apikey . "\n", FILE_APPEND);
         return;
     }
 
-    $log = date('c') . ' ua:' . $_SERVER['HTTP_USER_AGENT'];
+    $log = $date . ' ua:' . $_SERVER['HTTP_USER_AGENT'];
     if ($apikey) {
         $log .= '; key:' . truncateMiddle($apikey, 20);
     }
@@ -161,6 +162,10 @@ function getLog($logfile, $page = 1, $app = false)
                         $error = '';
                         if (str_contains_any($line, ['Code:3', 'Code:4', 'Code:5'])) {
                             $error = '<span class="text-danger">[ERROR]</span> ';
+                        }
+
+                        if (str_contains($line, '[req ')) {
+                            $error = '<span class="text-info">[VERIFICATION]</span> ';
                         }
 
                         if ($app && !str_contains($line, 'key:' . $_POST['key'])) {

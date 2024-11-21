@@ -21,6 +21,9 @@ if (!defined('ABSOLUTE_PATH')) {
 
 require ABSOLUTE_PATH . 'loader.php';
 
+$requestCounter = $cache->get(REQUEST_COUNTER_KEY) + 1;
+$cache->set(REQUEST_COUNTER_KEY, $requestCounter, REQUEST_COUNTER_TIME);
+
 $logfile = LOGS_PATH . 'access.log';
 
 $internalEndpoint = false;
@@ -161,6 +164,11 @@ if ($internalEndpoint) {
         apiResponse(401, ['error' => sprintf(APP_API_ERROR, 'provided apikey is not valid or has no access')]);
     }
 
+    $proxiedAppLogfile = str_replace('access.log', 'access_' . $proxiedApp['proxiedAppDetails']['name'] . '.log', $logfile);
+
+    logger($proxiedAppLogfile, '[req ' . $requestCounter . '] incoming request from apikey: ' . truncateMiddle($apikey, 20), null, 999);
+    logger($proxiedAppLogfile, '[req ' . $requestCounter . '] $starr->getAppFromProxiedKey: name=' . $proxiedApp['proxiedAppDetails']['name'] . ', id=' . $proxiedApp['proxiedAppDetails']['id'], null, 999);
+
     if (!$endpoint && $_GET['backup']) { //--- Notifiarr corruption checking
         $proxyBackup = $starr->downloadBackup($_GET['backup'], $proxiedApp['starrAppDetails']);
 
@@ -179,7 +187,7 @@ if ($internalEndpoint) {
             $endpoint = $starrEndpoint;
         } else {
             logger($logfile, $apikey, $endpoint, 401);
-            logger(str_replace('access.log', 'access_' . $proxiedApp['proxiedAppDetails']['name'] . '.log', $logfile), $apikey, $endpoint, 401);
+            logger($proxiedAppLogfile, $apikey, $endpoint, 401);
             $usageDb->adjustAppUsage($proxiedApp['proxiedAppDetails']['id'], 401);
 
             if ($proxyDb->isNotificationTriggerEnabled('blocked')) {
@@ -197,7 +205,7 @@ if ($internalEndpoint) {
 
         if (!$accessMethod = $starr->isAllowedEndpointMethod($proxiedApp['access'], $endpoint, $method)) {
             logger($logfile, $apikey, $endpoint, 405);
-            logger(str_replace('access.log', 'access_' . $proxiedApp['proxiedAppDetails']['name'] . '.log', $logfile), $apikey, $endpoint, 405);
+            logger($proxiedAppLogfile, $apikey, $endpoint, 405);
             $usageDb->adjustAppUsage($proxiedApp['proxiedAppDetails']['id'], 405);
 
             if ($proxyDb->isNotificationTriggerEnabled('blocked')) {
@@ -218,7 +226,7 @@ if ($internalEndpoint) {
         $request    = curl($starrUrl, ['X-Api-Key:' . $proxiedApp['starrAppDetails']['apikey']], $method, $json);
 
         logger($logfile, $apikey, $endpoint, 200, $request['code']);
-        logger(str_replace('access.log', 'access_' . $proxiedApp['proxiedAppDetails']['name'] . '.log', $logfile), $apikey, $originalEndpoint, 200, $request['code'], $request);
+        logger($proxiedAppLogfile, $apikey, $originalEndpoint, 200, $request['code'], $request);
         $usageDb->adjustAppUsage($proxiedApp['proxiedAppDetails']['id'], $request['code']);
 
         if ($request['code'] <= 299 && str_contains($endpoint, 'mediacover')) { //-- OUTPUT THE REQUESTED IMAGE

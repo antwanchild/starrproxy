@@ -46,6 +46,8 @@ define('CRON_HOUSEKEEPER_LOG', LOGS_PATH . 'system/cron-housekeeper.log');
 define('LOG_LINES_PER_PAGE', 1000);
 
 //-- CACHE
+define('REQUEST_COUNTER_KEY', 'requests');
+define('REQUEST_COUNTER_TIME', 86400); //-- 1 DAY
 define('STARRS_TABLE_CACHE_KEY', 'starr_table');
 define('STARRS_TABLE_CACHE_TIME', 86400); //-- 1 DAY
 define('APPS_TABLE_CACHE_KEY', 'apps_table');
