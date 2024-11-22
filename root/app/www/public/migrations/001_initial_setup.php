@@ -72,14 +72,14 @@ $q[] = "INSERT INTO " . SETTINGS_TABLE . "
         ('migration', '001')";
 
 foreach ($q as $query) {
-	logger(MIGRATION_LOG, '<span class="text-success">[Q]</span> ' . preg_replace('!\s+!', ' ', $query));
+    logger(MIGRATION_LOG, ['text' => '<span class="text-success">[Q]</span> ' . preg_replace('!\s+!', ' ', $query)]);
 
     $proxyDb->query($query);
 
 	if ($proxyDb->error() != 'not an error') {
-		logger(MIGRATION_LOG, '<span class="text-info">[R]</span> ' . $proxyDb->error(), 'error');
+        logger(MIGRATION_LOG, ['text' => '<span class="text-info">[R]</span> ' . $proxyDb->error()]);
 	} else {
-		logger(MIGRATION_LOG, '<span class="text-info">[R]</span> query applied!');
+        logger(MIGRATION_LOG, ['text' => '<span class="text-info">[R]</span> query applied!']);
 	}
 }
 
@@ -92,13 +92,13 @@ $q[] = "CREATE TABLE " . USAGE_TABLE . " (
         )";
 
 foreach ($q as $query) {
-	logger(MIGRATION_LOG, '<span class="text-success">[Q]</span> ' . preg_replace('!\s+!', ' ', $query));
+    logger(MIGRATION_LOG, ['text' => '<span class="text-success">[Q]</span> ' . preg_replace('!\s+!', ' ', $query)]);
 
     $usageDb->query($query);
 
 	if ($usageDb->error() != 'not an error') {
-		logger(MIGRATION_LOG, '<span class="text-info">[R]</span> ' . $usageDb->error(), 'error');
+        logger(MIGRATION_LOG, ['text' => '<span class="text-info">[R]</span> ' . $usageDb->error()]);
 	} else {
-		logger(MIGRATION_LOG, '<span class="text-info">[R]</span> query applied!');
+        logger(MIGRATION_LOG, ['text' => '<span class="text-info">[R]</span> query applied!']);
 	}
 }

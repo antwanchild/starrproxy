@@ -7,40 +7,56 @@
 ----------------------------------
 */
 
-function logger($logfile, $apikey = '', $endpoint = '', $proxyCode = 200, $starrCode = 0, $starrRequest = [])
+function logger($logfile, $logParameters)
 {
-    if (!$logfile) {
-        return;
+    global $settingsTable, $LOG_ROTATE_SIZE;
+
+    $backtrace  = debug_backtrace();
+    $log        = [];
+    $date       = date(sprintf('Y-m-d\TH:i:s%s', substr(microtime(), 1, 8)));
+    $log[]      = $date;
+
+    if ($logParameters['req']) {
+        $log[] = '[' . $logParameters['req'] . ']';
     }
 
-    $date = date(sprintf('Y-m-d\TH:i:s%s', substr(microtime(), 1, 8)));
-    if (str_equals_any($logfile, [MIGRATION_LOG, SYSTEM_LOG]) || str_contains_any($logfile, ['notifications/']) || $proxyCode == 999) {
-        file_put_contents($logfile, $date . ' ' . $apikey . "\n", FILE_APPEND);
-        return;
+    if ($logParameters['starr']) {
+        $log[] = '[' . $logParameters['starr'] . ']';
     }
 
-    $log = $date . ' ua:' . $_SERVER['HTTP_USER_AGENT'];
-    if ($apikey) {
-        $log .= '; key:' . truncateMiddle($apikey, 20);
-    }
-    if ($endpoint) {
-        $log .= '; endpoint:' . $endpoint;
-    }
+    if ($logParameters['text']) {
+        $log[] = $logParameters['text'];
 
-    $log .= '; method:' . strtolower($_SERVER['REQUEST_METHOD']);
-    $log .= '; proxyCode:' . $proxyCode;
+        if ($logParameters['notificationCode']) {
+            $log[] = 'notificationCode:' . $logParameters['notificationCode'] . ';';
+        }
+    } else {
+        $log[] = 'ua:' . $_SERVER['HTTP_USER_AGENT'] . ';';
+        if ($logParameters['apikey']) {
+            $log[] = 'key:' . truncateMiddle($logParameters['apikey'], 20) . ';';
+        }
+        if ($logParameters['endpoint']) {
+            $log[] = 'endpoint:' . $logParameters['endpoint'] . ';';
+        }
 
-    if ($starrCode) {
-        $log .= '; starrCode:' . $starrCode;
-
-        if ($starrCode != 200) {
-            $log .= '; starrResponse:' . json_encode($starrRequest);
+        $log[] = 'method:' . strtolower($_SERVER['REQUEST_METHOD']) . ';';
+        $log[] = 'proxyCode:' . $logParameters['proxyCode'] . ';';
+    
+        if ($logParameters['starrCode']) {
+            $log[] = 'starrCode:' . $logParameters['starrCode'] . ';';
+    
+            if ($logParameters['starrCode'] != 200 && $logParameters['starrRequest']) {
+                $log[] = 'starrResponse:' . json_encode($logParameters['starrRequest']);
+            }
         }
     }
 
-    file_put_contents($logfile, $log . "\n", FILE_APPEND);
+    $log[] = 'file:' . $backtrace[0]['file'] . ';';
+    $log[] = 'line:' . $backtrace[0]['line'] . ';';
 
-    $rotateSize = LOG_ROTATE_SIZE * pow(1024, 2);
+    file_put_contents($logfile, implode(' ', $log) . "\n", FILE_APPEND);
+
+    $rotateSize = ($settingsTable['logRotationSize'] ?: $LOG_ROTATE_SIZE) * pow(1024, 2);
     if (filesize($logfile) >= $rotateSize) {
         $rotated = str_replace('.log', '_' . time() . '.log', $logfile);
         rename($logfile, $rotated);
@@ -164,7 +180,7 @@ function getLog($logfile, $page = 1, $app = false)
                             $error = '<span class="text-danger">[ERROR]</span> ';
                         }
 
-                        if (str_contains($line, '[req ')) {
+                        if (str_contains($line, 'getAppFromProxiedKey')) {
                             $error = '<span class="text-info">[VERIFICATION]</span> ';
                         }
 

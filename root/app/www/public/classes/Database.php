@@ -151,14 +151,15 @@ class Database
         setFile(MIGRATION_FILE, ['started' => date('c')]);
 
         if (filesize(DATABASE_PATH . $this->dbName) == 0) { //-- INITIAL SETUP
-            logger(SYSTEM_LOG, 'Creating database and applying migration 001_initial_setup');
-            logger(MIGRATION_LOG, '====================|');
-            logger(MIGRATION_LOG, '====================| migrations');
-            logger(MIGRATION_LOG, '====================|');
-            logger(MIGRATION_LOG, 'migration 001 ->');
+            logger(SYSTEM_LOG, ['text' => 'Creating database and applying migration 001_initial_setup']);
+            logger(MIGRATION_LOG, ['text' => '====================|']);
+            logger(MIGRATION_LOG, ['text' => '====================| migrations']);
+            logger(MIGRATION_LOG, ['text' => '====================|']);
+            logger(MIGRATION_LOG, ['text' => 'migration 001 ->']);
+            logger(MIGRATION_LOG, ['text' => 'migration 001 <-']);
             $q = [];
             require MIGRATIONS_PATH . '001_initial_setup.php';
-            logger(MIGRATION_LOG, 'migration 001 <-');
+            logger(MIGRATION_LOG, ['text' => 'migration 001 <-']);
 
             $neededMigrations = [];
             $dir = opendir(MIGRATIONS_PATH);
@@ -173,10 +174,10 @@ class Database
                 ksort($neededMigrations);
 
                 foreach ($neededMigrations as $migrationNumber => $neededMigration) {
-                    logger(MIGRATION_LOG, 'migration ' . $migrationNumber . ' ->');
+                    logger(MIGRATION_LOG, ['text' => 'migration ' . $migrationNumber . ' ->']);
                     $q = [];
                     require MIGRATIONS_PATH . $neededMigration;
-                    logger(MIGRATION_LOG, 'migration ' . $migrationNumber . ' <-');
+                    logger(MIGRATION_LOG, ['text' => 'migration ' . $migrationNumber . ' <-']);
                 }
             }
         } else { //-- GET CURRENT MIGRATION & CHECK FOR NEEDED MIGRATIONS
@@ -192,16 +193,16 @@ class Database
             if ($neededMigrations) {
                 ksort($neededMigrations);
 
-                logger(SYSTEM_LOG, 'Applying migrations: ' . implode(', ', array_keys($neededMigrations)));
-                logger(MIGRATION_LOG, '====================|');
-                logger(MIGRATION_LOG, '====================| migrations');
-                logger(MIGRATION_LOG, '====================|');
+                logger(SYSTEM_LOG, ['text' => 'Applying migrations: ' . implode(', ', array_keys($neededMigrations))]);
+                logger(MIGRATION_LOG, ['text' => '====================|']);
+                logger(MIGRATION_LOG, ['text' => '====================| migrations']);
+                logger(MIGRATION_LOG, ['text' => '====================|']);
 
                 foreach ($neededMigrations as $migrationNumber => $neededMigration) {
-                    logger(MIGRATION_LOG, 'migration ' . $migrationNumber . ' ->');
+                    logger(MIGRATION_LOG, ['text' => 'migration ' . $migrationNumber . ' ->']);
                     $q = [];
                     require MIGRATIONS_PATH . $neededMigration;
-                    logger(MIGRATION_LOG, 'migration ' . $migrationNumber . ' <-');
+                    logger(MIGRATION_LOG, ['text' => 'migration ' . $migrationNumber . ' <-']);
                 }
             }
         }

@@ -43,7 +43,7 @@ $apikey             = $_GET['apikey'] ?: $_SERVER['HTTP_X_API_KEY'];
 $endpoint           = rtrim($endpoint, '/');
 
 if (!$apikey) {
-    logger($logfile, $apikey, null, 401);
+    logger($logfile, ['req' => $requestCounter, 'proxyCode' => 401]);
     apiResponse(401, ['error' => sprintf(APP_API_ERROR, 'no apikey provided')]);
 }
 
@@ -160,14 +160,13 @@ if ($internalEndpoint) {
     $app        = $starr->getStarrInterfaceNameFromId($proxiedApp['starrAppDetails']['starr']);
 
     if (!$proxiedApp) {
-        logger($logfile, $apikey, $endpoint, 401);
+        logger($logfile, ['req' => $requestCounter, 'apikey' => $apikey, 'endpoint' => $endpoint, 'proxyCode' => 401]);
         apiResponse(401, ['error' => sprintf(APP_API_ERROR, 'provided apikey is not valid or has no access')]);
     }
 
     $proxiedAppLogfile = str_replace('access.log', 'access_' . $proxiedApp['proxiedAppDetails']['name'] . '.log', $logfile);
 
-    logger($proxiedAppLogfile, '[req ' . $requestCounter . '] incoming request from apikey: ' . truncateMiddle($apikey, 20), null, 999);
-    logger($proxiedAppLogfile, '[req ' . $requestCounter . '] $starr->getAppFromProxiedKey: name=' . $proxiedApp['proxiedAppDetails']['name'] . ', id=' . $proxiedApp['proxiedAppDetails']['id'], null, 999);
+    logger($proxiedAppLogfile, ['req' => $requestCounter, 'starr' => $proxiedApp['starrAppDetails']['name'], 'text' => 'apikey: ' . truncateMiddle($apikey, 20) . '; $starr->getAppFromProxiedKey: id=' . $proxiedApp['proxiedAppDetails']['id'] . '; app=' . $proxiedApp['proxiedAppDetails']['name']]);
 
     if (!$endpoint && $_GET['backup']) { //--- Notifiarr corruption checking
         $proxyBackup = $starr->downloadBackup($_GET['backup'], $proxiedApp['starrAppDetails']);
@@ -186,8 +185,8 @@ if ($internalEndpoint) {
         if ($isAllowed) {
             $endpoint = $starrEndpoint;
         } else {
-            logger($logfile, $apikey, $endpoint, 401);
-            logger($proxiedAppLogfile, $apikey, $endpoint, 401);
+            logger($logfile, ['req' => $requestCounter, 'apikey' => $apikey, 'endpoint' => $endpoint, 'proxyCode' => 401]);
+            logger($proxiedAppLogfile, ['req' => $requestCounter, 'apikey' => $apikey, 'endpoint' => $endpoint, 'proxyCode' => 401]);
             $usageDb->adjustAppUsage($proxiedApp['proxiedAppDetails']['id'], 401);
 
             if ($proxyDb->isNotificationTriggerEnabled('blocked')) {
@@ -204,8 +203,8 @@ if ($internalEndpoint) {
         }
 
         if (!$accessMethod = $starr->isAllowedEndpointMethod($proxiedApp['access'], $endpoint, $method)) {
-            logger($logfile, $apikey, $endpoint, 405);
-            logger($proxiedAppLogfile, $apikey, $endpoint, 405);
+            logger($logfile, ['req' => $requestCounter, 'apikey' => $apikey, 'endpoint' => $endpoint, 'proxyCode' => 405]);
+            logger($proxiedAppLogfile, ['req' => $requestCounter, 'apikey' => $apikey, 'endpoint' => $endpoint, 'proxyCode' => 405]);
             $usageDb->adjustAppUsage($proxiedApp['proxiedAppDetails']['id'], 405);
 
             if ($proxyDb->isNotificationTriggerEnabled('blocked')) {
@@ -225,8 +224,9 @@ if ($internalEndpoint) {
         $starrUrl   = $proxiedApp['starrAppDetails']['url'] . $originalEndpoint . ($variables ? '?' . http_build_query($variables) : '');
         $request    = curl($starrUrl, ['X-Api-Key:' . $proxiedApp['starrAppDetails']['apikey']], $method, $json);
 
-        logger($logfile, $apikey, $endpoint, 200, $request['code']);
-        logger($proxiedAppLogfile, $apikey, $originalEndpoint, 200, $request['code'], $request);
+        logger($logfile, ['req' => $requestCounter, 'apikey' => $apikey, 'endpoint' => $originalEndpoint, 'proxyCode' => 200, 'starrCode' => $request['code']]);
+        logger($proxiedAppLogfile, ['req' => $requestCounter, 'apikey' => $apikey, 'endpoint' => $originalEndpoint, 'proxyCode' => 200, 'starrCode' => $request['code'], 'starrRequest' => $request]);
+
         $usageDb->adjustAppUsage($proxiedApp['proxiedAppDetails']['id'], $request['code']);
 
         if ($request['code'] <= 299 && str_contains($endpoint, 'mediacover')) { //-- OUTPUT THE REQUESTED IMAGE

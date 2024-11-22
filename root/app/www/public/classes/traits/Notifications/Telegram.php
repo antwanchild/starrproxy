@@ -24,15 +24,15 @@ trait Telegram
         $url        = sprintf($url, $botToken);
         $curl       = curl($url, [], 'POST', json_encode($payload));
 
-        logger($logfile, 'notification response:' . json_encode($curl), ($curl['code'] != 200 ? 'error' : ''));
+        logger($logfile, ['text' => 'notification response:' . json_encode($curl), 'notificationCode' => $curl['code']]);
 
         $return = ['code' => 200];
         if (!str_equals_any($curl['code'], [200, 201, 400, 401])) {
-            logger($logfile, 'sending a retry in 5s...');
+            logger($logfile, ['text' => 'sending a retry in 5s...']);
             sleep(5);
 
             $curl = curl($url, [], 'POST', json_encode($payload));
-            logger($logfile, 'notification response:' . json_encode($curl), ($curl['code'] != 200 ? 'error' : ''));
+            logger($logfile, ['text' => 'notification response:' . json_encode($curl), 'notificationCode' => $curl['code']]);
 
             if ($curl['code'] != 200) {
                 $return = ['code' => $curl['code'], 'error' => $curl['response']['description']];

@@ -9,10 +9,10 @@
 
 function getFile($file)
 {
-    logger(SYSTEM_LOG, 'getFile() ' . $file);
+    logger(SYSTEM_LOG, ['text' => 'getFile() ' . $file]);
 
     if (!$file) {
-        logger(SYSTEM_LOG, '$file is empty');
+        logger(SYSTEM_LOG, ['text' => '$file is empty']);
         return [];
     }
 
@@ -25,7 +25,7 @@ function getFile($file)
 
 function setFile($file, $contents)
 {
-    logger(SYSTEM_LOG, 'setFile() ' . $file);
+    logger(SYSTEM_LOG, ['text' => 'setFile() ' . $file]);
 
     if (is_array($contents)) {
         $contents = json_encode($contents, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
@@ -40,7 +40,6 @@ function setFile($file, $contents)
 
 function deleteFile($file)
 {
-    logger(SYSTEM_LOG, 'deleteFile() ' . $file);
-
+    logger(SYSTEM_LOG, ['text' => 'deleteFile() ' . $file]);
     unlink($file);
 }

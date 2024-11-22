@@ -53,10 +53,10 @@ class Notifications
         $notificationPlatform = $notificationPlatformTable[$notificationLinkData['platform_id']];
 
         $logfile = $this->logpath . $notificationPlatform['platform'] . '.log';
-        logger($logfile, 'test notification request to ' . $notificationPlatform['platform']);
-        logger($logfile, 'test=' . $name);
-        logger($logfile, 'tests=' . json_encode($tests));
-        logger($logfile, 'test payload=' . json_encode($tests[$name]));
+        logger($logfile, ['text' => 'test notification request to ' . $notificationPlatform['platform']]);
+        logger($logfile, ['text' => 'test=' . $name]);
+        logger($logfile, ['text' => 'tests=' . json_encode($tests)]);
+        logger($logfile, ['text' => 'test payload=' . json_encode($tests[$name])]);
 
         $result = $this->notify($linkId, $name, $tests[$name], true);
 
@@ -125,8 +125,8 @@ class Notifications
             }
 
             $logfile = $this->logpath . $platformName . '.log';
-            logger($logfile, 'notification request to ' . $platformName);
-            logger($logfile, 'notification payload: ' . json_encode($payload));
+            logger($logfile, ['text' => 'notification request to ' . $platformName]);
+            logger($logfile, ['text' => 'notification payload: ' . json_encode($payload)]);
 
             switch ($platformId) {
                 case NotificationPlatforms::NOTIFIARR:

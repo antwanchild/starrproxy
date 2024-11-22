@@ -31,13 +31,13 @@ $q[] = "INSERT INTO " . SETTINGS_TABLE . "
         VALUES " . implode(', ', $settingRows);
 
 foreach ($q as $query) {
-	logger(MIGRATION_LOG, '<span class="text-success">[Q]</span> ' . preg_replace('!\s+!', ' ', $query));
+    logger(MIGRATION_LOG, ['text' => '<span class="text-success">[Q]</span> ' . preg_replace('!\s+!', ' ', $query)]);
 
     $proxyDb->query($query);
 
 	if ($proxyDb->error() != 'not an error') {
-		logger(MIGRATION_LOG, '<span class="text-info">[R]</span> ' . $proxyDb->error(), 'error');
+        logger(MIGRATION_LOG, ['text' => '<span class="text-info">[R]</span> ' . $proxyDb->error()]);
 	} else {
-		logger(MIGRATION_LOG, '<span class="text-info">[R]</span> query applied!');
+        logger(MIGRATION_LOG, ['text' => '<span class="text-info">[R]</span> query applied!']);
 	}
 }
