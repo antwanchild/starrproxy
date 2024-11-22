@@ -124,7 +124,7 @@ function getLog($logfile, $page = 1, $app = false)
     global $starr, $shell;
 
     $page   = $page <= 1 ? 1 : $page;
-    $start  = $page == 1 ?  0 : $page * LOG_LINES_PER_PAGE;
+    $start  = $page == 1 ? 0 : $page * LOG_LINES_PER_PAGE - LOG_LINES_PER_PAGE;
     $end    = $start + LOG_LINES_PER_PAGE;
 
     $starr      = $starr ?:new Starr();
