@@ -19,11 +19,13 @@ trait Overrides
         $overrides['lidarr']    = [];
         $overrides['prowlarr']  = [];
         $overrides['radarr']    = [
-                                    '/api/' . $version . '/movie' => ['put']
+                                    '/api/' . $version . '/movie'           => ['put'],
+                                    '/api/' . $version . '/config/naming'   => ['put']
                                 ];
         $overrides['readarr']   = [];
         $overrides['sonarr']    = [
-                                    '/api/' . $version . '/series' => ['put']
+                                    '/api/' . $version . '/series'          => ['put'],
+                                    '/api/' . $version . '/config/naming'   => ['put']
                                 ];
         $overrides['whisparr']  = [];
 

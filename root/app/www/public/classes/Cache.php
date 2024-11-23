@@ -66,4 +66,13 @@ class Cache
 
         $this->cache->delete($key);
     }
+
+    public function stats()
+    {
+        if (!$this->cache) {
+            $this->init();
+        }
+
+        return $this->cache->getStats();
+    }
 }

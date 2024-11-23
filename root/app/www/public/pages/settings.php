@@ -25,6 +25,7 @@ while ($migration = readdir($dir)) {
 closedir($dir);
 
 $backups = $proxyDb->getBackups();
+$cacheStats = $cache->stats();
 ?>
 <div class="w-100 mb-2">
     <button class="btn btn-outline-success border-light" onclick="saveSettings()"><i class="far fa-save"></i> Save</button>
@@ -190,6 +191,39 @@ $backups = $proxyDb->getBackups();
                                     <span class="text-small">Default: <?= LOG_AGE ?></span>
                                 </td>
                                 <td><input type="number" class="form-control d-inline-block w-25" id="setting-logRetentionLength" value="<?= LOG_AGE ?>"> days</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-sm-12">
+        <div class="card border-default mb-3">
+            <div class="card-header">Cache</div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-bordered table-hover">
+                        <tbody>
+                            <tr>
+                                <td class="w-25">Memcache enabled</td>
+                                <td><?= !empty($cacheStats) ? 'Yes (' . byteConversion($cacheStats['127.0.0.1:11211']['bytes']) . ', ' . $cacheStats['127.0.0.1:11211']['curr_items'] . ' items)' : 'No' ?></td>
+                            </tr>
+                            <tr>
+                                <td>Cache</td>
+                                <td>
+                                    <i class="far fa-trash-alt text-danger" title="Bust cache" style="cursor:pointer;" onclick="bustCache('<?= REQUEST_COUNTER_KEY ?>')"></i> Key: <?= REQUEST_COUNTER_KEY ?>, Utilized: <?= $cache->get(REQUEST_COUNTER_KEY) ? 'Yes' : 'No' ?><br>
+                                    <i class="far fa-trash-alt text-danger" title="Bust cache" style="cursor:pointer;" onclick="bustCache('<?= STARRS_TABLE_CACHE_KEY ?>')"></i> Key: <?= STARRS_TABLE_CACHE_KEY ?>, Utilized: <?= $cache->get(STARRS_TABLE_CACHE_KEY) ? 'Yes' : 'No' ?><br>
+                                    <i class="far fa-trash-alt text-danger" title="Bust cache" style="cursor:pointer;" onclick="bustCache('<?= APPS_TABLE_CACHE_KEY ?>')"></i> Key: <?= APPS_TABLE_CACHE_KEY ?>, Utilized: <?= $cache->get(APPS_TABLE_CACHE_KEY) ? 'Yes' : 'No' ?><br>
+                                    <?php
+                                    foreach (StarrApps::LIST as $starr) {
+                                        $cacheKey = sprintf(STARR_ENDPOINT_LIST_KEY, $starr);
+                                        ?>
+                                        <i class="far fa-trash-alt text-danger" title="Bust cache" style="cursor:pointer;" onclick="bustCache('<?= $cacheKey ?>')"></i> Key: <?= $cacheKey ?>, Utilized: <?= $cache->get($cacheKey) ? 'Yes' : 'No' ?><br>
+                                        <?php
+                                    }
+                                    ?>
+                                </td>
                             </tr>
                         </tbody>
                     </table>

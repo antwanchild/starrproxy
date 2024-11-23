@@ -35,3 +35,7 @@ if ($_POST['m'] == 'saveSettings') {
         file_put_contents(APP_APIKEY_FILE, $_POST['apikey']);
     }
 }
+
+if ($_POST['m'] == 'bustCache') {
+    $cache->bust($_POST['key']);
+}

@@ -149,10 +149,10 @@ $getTotalUsageStats     = getTotalUsageStats($starrsTable, $appsTable, $usageTab
                             if (file_exists($templateFile)) {
                                 $appTemplate = getFile($templateFile);
 
-                                if (count($appAccess) != count($appTemplate)) {
+                                if (count($appAccess, COUNT_RECURSIVE) != count($appTemplate, COUNT_RECURSIVE)) {
                                     foreach ($starrsTable as $starrApp) {
                                         if ($starrApp['id'] == $app['starr_id']) {
-                                            $notMatching[$starrApp['name']][] = ['id' => $app['id'], 'app' => $app['name'], 'template' => count($appTemplate), 'endpoints' => count($appAccess)];
+                                            $notMatching[$starrApp['name']][] = ['id' => $app['id'], 'app' => $app['name'], 'template' => count($appTemplate, COUNT_RECURSIVE), 'endpoints' => count($appAccess, COUNT_RECURSIVE)];
                                             break;
                                         }
                                     }
@@ -166,8 +166,8 @@ $getTotalUsageStats     = getTotalUsageStats($starrsTable, $appsTable, $usageTab
                                 <tr>
                                     <td>Starr</td>
                                     <td>App</td>
-                                    <td>App endpoints</td>
-                                    <td>Template endpoints</td>
+                                    <td>App access</td>
+                                    <td>Template access</td>
                                     <td></td>
                                 </tr>
                                 <?php
@@ -179,7 +179,7 @@ $getTotalUsageStats     = getTotalUsageStats($starrsTable, $appsTable, $usageTab
                                             <td><?= $starrAppApp['app'] ?></td>
                                             <td><?= $starrAppApp['endpoints'] ?></td>
                                             <td><?= $starrAppApp['template'] ?></td>
-                                            <td><i class="far fa-check-circle text-success" title="Match endpoints to template" style="cursor:pointer;" onclick="viewAppEndpointDiff(<?= $starrAppApp['id'] ?>)"></i></td>
+                                            <td><i class="far fa-check-circle text-success" title="Match endpoints/methods to template" style="cursor:pointer;" onclick="viewAppEndpointDiff(<?= $starrAppApp['id'] ?>)"></i></td>
                                         </tr>
                                         <?php
                                     }

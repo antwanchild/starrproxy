@@ -23,3 +23,18 @@ function saveSettings()
     });
 }
 // -------------------------------------------------------------------------------------------
+function bustCache(key)
+{
+    loadingStart();
+
+    $.ajax({
+        type: 'POST',
+        url: 'ajax/settings.php',
+        data: '&m=bustCache&key=' + key,
+        success: function (resultData) {
+            toast('Cache', 'The cache has been busted for the key: ' + key, 'success');
+            loadingStop();
+        }
+    });
+}
+// -------------------------------------------------------------------------------------------

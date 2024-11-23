@@ -107,7 +107,7 @@ if (!$_SESSION['IN_UI']) {
                 $templateFile = file_exists($accessApp['template']) ? $accessApp['template'] : str_replace('../', './', $accessApp['template']);
                 if (file_exists($templateFile)) {
                     $templateEndpoints = getFile($templateFile);
-                    $template = ', <span ' . (count($accessApp['endpoints']) != count($templateEndpoints) ? 'class="text-warning" title="Template does not match, click to fix that" style="cursor: pointer;" onclick="viewAppEndpointDiff(' . $accessApp['id'] . ')"' : '') . '>Template: ' . count($templateEndpoints) . ' endpoint' . (count($templateEndpoints) == 1 ? '' : 's') . '</span>';
+                    $template = ', <span ' . (count($accessApp['endpoints'], COUNT_RECURSIVE) != count($templateEndpoints, COUNT_RECURSIVE) ? 'class="text-warning" title="Template does not match, click to fix that" style="cursor: pointer;" onclick="viewAppEndpointDiff(' . $accessApp['id'] . ')"' : '') . '>Template: ' . count($templateEndpoints, COUNT_RECURSIVE) . ' endpoint' . (count($templateEndpoints, COUNT_RECURSIVE) == 1 ? '' : 's') . '</span>';
                 }
                 ?>
                 <div class="col-sm-12 col-lg-3">
@@ -139,7 +139,7 @@ if (!$_SESSION['IN_UI']) {
                         </div>
                         <div class="card-body">
                             Instance: <?= $parentStarrApp['name'] ?> <span class="text-small"><?= $parentStarrApp['url'] ?></span><br>
-                            Access: <?= count($accessApp['endpoints']) ?> endpoint<?= count($accessApp['endpoints']) == 1 ? '' : 's' ?><?= $template ?><br>
+                            Access: <?= count($accessApp['endpoints'], COUNT_RECURSIVE) ?> endpoint<?= count($accessApp['endpoints'], COUNT_RECURSIVE) == 1 ? '' : 's' ?><?= $template ?><br>
                             Apikey: <?= truncateMiddle($accessApp['apikey'], 20) ?> <i class="far fa-copy text-info" style="cursor: pointer;" onclick="clipboard('app-<?= $accessApp['id'] ?>-apikey', 'html')" title="Copy apikey to clipboard"></i><span id="app-<?= $accessApp['id'] ?>-apikey" style="display: none;"><?= $accessApp['apikey'] ?></span><br>
                             Usage: <?= number_format($usage['allowed'] + $usage['rejected']) ?> request<?= $usage['allowed'] + $usage['rejected'] == 1 ? '' : 's' ?> (Allowed: <?= number_format($usage['allowed']) ?> Rejected: <?= number_format($usage['rejected']) ?>)
                         </div>
