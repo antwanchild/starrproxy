@@ -47,11 +47,16 @@ if (!$_SESSION['IN_UI']) {
                             $starrInstance['name'] = $test['response']['instanceName'];
                         }
 
+                        $instanceDown = !$version ? true : false;
                         ?>
                         <tr>
                             <td>
-                                <?= $starrInstance['name'] ?><br>
-                                <span class="text-small"><?= $branch ?> → v<?= $version ?></span>
+                                <?php if ($instanceDown) { ?>
+                                    <div class="text-center text-danger">Unreachable</div>
+                                <?php } else { ?>
+                                    <?= $starrInstance['name'] ?><br>
+                                    <span class="text-small"><?= $branch ?> → v<?= $version ?></span>
+                                <?php } ?>
                             </td>
                             <td><input type="text" class="form-control" id="instance-url-<?= $starrInstance['id'] ?>" placeholder="http://localhost:1111" value="<?= $starrInstance['url'] ?>"></td>
                             <td>

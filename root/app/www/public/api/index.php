@@ -237,6 +237,10 @@ if ($internalEndpoint) {
             echo $request['response'];
             exit();
         } else { //-- RETURN THE JSON API RESPONSE
+            if (!$request['code']) {
+                apiResponse(502, ['error' => sprintf(APP_API_ERROR, 'could not access the requested starr app, it appears to be down and returning an HTTP 0 code')]);
+            }
+
             apiResponse($request['code'], $request['response'], $request['responseHeaders']);
         }
     }
