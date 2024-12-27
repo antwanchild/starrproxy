@@ -40,7 +40,7 @@ if (!$_SESSION['IN_UI']) {
 
                         $test       = $starr->testConnection($app, $starrInstance['url'], $starrInstance['apikey']);
                         $version    = $test['responseHeaders']['X-Application-Version'][0];
-                        $branch     = $test['response']['branch'];
+                        $branch     = $version && is_array($test) && is_array($test['response']) ? $test['response']['branch'] : '';
 
                         if ($test['response']['instanceName'] != $starrInstance['name']) {
                             $proxyDb->updateStarrAppSetting($starrInstance['id'], 'name', $test['response']['instanceName']);
