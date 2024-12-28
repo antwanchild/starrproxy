@@ -71,7 +71,7 @@ trait Starrs
         $this->query($q);
 
         if ($this->error() != 'not an error') {
-            return $this->error();
+            return 'addStarrApp() :: ' . $this->error();
         }
 
         $this->cache->bust(STARRS_TABLE_CACHE_KEY);
@@ -82,12 +82,12 @@ trait Starrs
     public function updateStarrApp($id, $fields = [])
     {
         $q = "UPDATE " . STARRS_TABLE . "
-              SET name = '" . $this->prepare($fields['name']) . "', url = '" . $this->prepare($fields['url']) . "'', apikey = '" . $this->prepare($fields['apikey']) . "', username = '" . $this->prepare($fields['username']) . "', password = '" . $this->prepare($fields['password']) . "'
+              SET name = '" . $this->prepare($fields['name']) . "', url = '" . $this->prepare($fields['url']) . "', apikey = '" . $this->prepare($fields['apikey']) . "', username = '" . $this->prepare($fields['username']) . "', password = '" . $this->prepare($fields['password']) . "'
               WHERE id = " . intval($id);
         $this->query($q);
 
         if ($this->error() != 'not an error') {
-            return $this->error();
+            return 'updateStarrApp() :: ' . $this->error();
         }
 
         $this->cache->bust(STARRS_TABLE_CACHE_KEY);
