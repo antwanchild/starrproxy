@@ -40,11 +40,15 @@ if (!$_SESSION['IN_UI']) {
 
                         $test       = $starr->testConnection($app, $starrInstance['url'], $starrInstance['apikey']);
                         $version    = $test['responseHeaders']['X-Application-Version'][0];
-                        $branch     = $version && is_array($test) && is_array($test['response']) ? $test['response']['branch'] : '';
+                        $branch     = '';
 
-                        if ($test['response']['instanceName'] != $starrInstance['name']) {
-                            $proxyDb->updateStarrAppSetting($starrInstance['id'], 'name', $test['response']['instanceName']);
-                            $starrInstance['name'] = $test['response']['instanceName'];
+                        if ($version && is_array($test) && is_array($test['response'])) {
+                            $branch = $test['response']['branch'];
+
+                            if ($test['response']['instanceName'] != $starrInstance['name']) {
+                                $proxyDb->updateStarrAppSetting($starrInstance['id'], 'name', $test['response']['instanceName']);
+                                $starrInstance['name'] = $test['response']['instanceName'];
+                            }
                         }
 
                         $instanceDown = !$version ? true : false;
