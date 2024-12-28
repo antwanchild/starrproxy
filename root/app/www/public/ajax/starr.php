@@ -26,7 +26,11 @@ if ($_POST['m'] == 'testStarr') {
     if ($test['code'] != 200) {
         $error = 'Failed to connect with code: ' . $test['code'];
     } else {
-        $result = 'Connection successful to ' . $app . ': Instance ' . $test['response']['instanceName'];
+        if (str_contains($test['response'], 'doctype')) {
+            $error = 'The starr app returned HTML, this typically happens with a bad base URL.';
+        } else {
+            $result = 'Connection successful to ' . $app . ': Instance ' . $test['response']['instanceName'];
+        }
     }
 
     echo json_encode(['error' => $error, 'result' => $result]);
@@ -57,7 +61,11 @@ if ($_POST['m'] == 'saveStarr') {
     $name = 'ERROR';
 
     if ($test['code'] == 200) {
-        $name = $test['response']['instanceName'];
+        if (str_contains($test['response'], 'doctype')) {
+            $error = 'The starr app returned HTML, this typically happens with a bad base URL.';
+        } else {
+            $name = $test['response']['instanceName'];
+        }
     }
 
     $fields = [
@@ -68,10 +76,12 @@ if ($_POST['m'] == 'saveStarr') {
                 'password'  => rawurldecode($_POST['password'])
             ];
 
-    if ($_POST['starrId'] == '99') {
-        $error = $proxyDb->addStarrApp($app, $fields);
-    } else {
-        $error = $proxyDb->updateStarrApp($_POST['starrId'], $fields);
+    if (!$error) {
+        if ($_POST['starrId'] == '99') {
+            $error = $proxyDb->addStarrApp($app, $fields);
+        } else {
+            $error = $proxyDb->updateStarrApp($_POST['starrId'], $fields);
+        }
     }
 
     echo $error;

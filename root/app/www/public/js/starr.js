@@ -21,12 +21,12 @@ function testStarr(starrId, app)
         data: '&m=testStarr&starrId=' + starrId + '&url=' + $('#instance-url-' + starrId).val() + '&apikey=' + apikey + '&app=' + app,
         dataType: 'json',
         success: function (resultData) {
-            let type = 'success';
             if (resultData.error) {
-                type = 'error';
+                toast('Starr test', resultData.error, 'error');
+                return;
             }
 
-            toast('Starr test', resultData.result, type);
+            toast('Starr test', resultData.result, 'success');
         }
     });
 }
