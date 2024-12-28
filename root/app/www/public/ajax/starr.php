@@ -26,7 +26,7 @@ if ($_POST['m'] == 'testStarr') {
     if ($test['code'] != 200) {
         $error = 'Failed to connect with code: ' . $test['code'];
     } else {
-        if (str_contains($test['response'], 'doctype')) {
+        if (!is_array($test['response']) && str_contains($test['response'], 'doctype')) {
             $error = 'The starr app returned HTML, this typically happens with a bad base URL.';
         } else {
             $result = 'Connection successful to ' . $app . ': Instance ' . $test['response']['instanceName'];
@@ -61,7 +61,7 @@ if ($_POST['m'] == 'saveStarr') {
     $name = 'ERROR';
 
     if ($test['code'] == 200) {
-        if (str_contains($test['response'], 'doctype')) {
+        if (!is_array($test['response']) && str_contains($test['response'], 'doctype')) {
             $error = 'The starr app returned HTML, this typically happens with a bad base URL.';
         } else {
             $name = $test['response']['instanceName'];
