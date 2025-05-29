@@ -14,4 +14,7 @@
     "/api/v3/episode": [
         "get"
     ]
+    "/api/v3/rootfolder": [
+        "get"
+    ]    
 }
