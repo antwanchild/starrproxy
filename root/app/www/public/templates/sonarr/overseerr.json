@@ -27,5 +27,8 @@
     "/api/v3/tag": [
         "get",
         "post"
+    ],
+    "/api/v3/importlistexclusion": [
+        "get"
     ]
 }
