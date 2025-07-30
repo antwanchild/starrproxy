@@ -1,6 +1,11 @@
 #!/usr/bin/with-contenv bash
 # shellcheck shell=bash
 
+if [[ ! grep -q "date.timezone" "/config/php/php-local.ini" ]]; then
+    # set default timezone
+    printf "\n\ndate.timezone = %s\\n" "${TZ:-UTC}" >>/config/php/php-local.ini
+fi
+
 echo 's6-overlay init require(/app/www/public/startup.php) ->';
 s6-setuidgid abc php -r "require '/app/www/public/startup.php';"
 echo 's6-overlay init require(/app/www/public/startup.php) <-';
