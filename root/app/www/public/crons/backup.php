@@ -8,7 +8,9 @@
 */
 
 if (!defined('ABSOLUTE_PATH')) {
-    if (is_dir('/app')) {
+    if (is_dir('/config/www')) {
+        define('ABSOLUTE_PATH', '/config/www/');
+    } elseif (is_dir('/app/www/public')) {
         define('ABSOLUTE_PATH', '/app/www/public/');
     } else {
         if (file_exists('loader.php')) {
