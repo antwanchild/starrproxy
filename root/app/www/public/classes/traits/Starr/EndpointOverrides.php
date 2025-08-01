@@ -7,12 +7,12 @@
 ----------------------------------
 */
 
-trait Overrides
+trait EndpointOverrides
 {
     /*
         This is needed because some applications do not follow the api spec and some endpoints work for methods that are not documented
     */
-    public function endpointOverrides($starr)
+    public function getEndpointOverrides($starr)
     {
         $version = $this->apiVersion($starr);
 
