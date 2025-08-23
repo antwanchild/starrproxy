@@ -44,7 +44,7 @@ foreach ($folders as $folder) {
     
             if (filemtime($logfile) <= (time() - (86400 * LOG_AGE))) {
                 echo date('c') . ' removing old logfile \'' . $logfile . '\''."\n";
-                $shell->exec('rm ' . $logfile);
+                $shell->exec('rm "' . $logfile . '"');
             }
         }
         closedir($dir);
@@ -61,7 +61,7 @@ if (is_dir(BACKUP_PATH)) {
         if (str_contains($backupFolder, '.zip')) {
             if (filemtime($backupFolder) <= (time() - (86400 * STARR_BACKUP_AGE))) {
                 echo date('c') . ' removing old starr backup \'' . $backupFolder . '\''."\n";
-                $shell->exec('rm ' . $backupFolder);
+                $shell->exec('rm "' . $backupFolder . '"');
             }
         }
 
@@ -71,7 +71,7 @@ if (is_dir(BACKUP_PATH)) {
 
         if (filemtime($backupFolder) <= (time() - (86400 * BACKUP_AGE))) {
             echo date('c') . ' removing old backup \'' . $backupFolder . '\''."\n";
-            $shell->exec('rm -r ' . $backupFolder);
+            $shell->exec('rm -r "' . $backupFolder . '"');
         }
     }
     closedir($dir);
