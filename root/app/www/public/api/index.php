@@ -159,7 +159,7 @@ if ($internalEndpoint) {
     $proxiedApp = $starr->getAppFromProxiedKey($apikey);
     $app        = $starr->getStarrInterfaceNameFromId($proxiedApp['starrAppDetails']['starr']);
 
-    if (!$proxiedApp) {
+    if (!$proxiedApp || !$proxiedApp['starrApp']) {
         logger($logfile, ['req' => $requestCounter, 'apikey' => $apikey, 'endpoint' => $endpoint, 'proxyCode' => 401]);
         apiResponse(401, ['error' => sprintf(APP_API_ERROR, 'provided apikey is not valid or has no access')]);
     }
@@ -177,6 +177,18 @@ if ($internalEndpoint) {
             header('Content-disposition: attachment; filename="' . $proxyBackup . '"'); 
             readfile($proxyBackup);
         }
+    } elseif (!$endpoint && $_GET['feed']) { //-- iCal links, let them through
+        unset($variables['feed'], $variables['apikey']);
+        $starrUrl   = $proxiedApp['starrAppDetails']['url'] . $_GET['feed'] . ($variables ? '?' . http_build_query($variables) : '');
+        $request    = curl($starrUrl, ['X-Api-Key:' . $proxiedApp['starrAppDetails']['apikey']], $method, $json);
+
+        logger($logfile, ['req' => $requestCounter, 'apikey' => $apikey, 'endpoint' => $_GET['feed'] . ($variables ? '?' . http_build_query($variables) : ''), 'proxyCode' => 200, 'starrCode' => $request['code']]);
+        logger($proxiedAppLogfile, ['req' => $requestCounter, 'apikey' => $apikey, 'endpoint' => $_GET['feed'] . ($variables ? '?' . http_build_query($variables) : ''), 'proxyCode' => 200, 'starrCode' => $request['code'], 'starrRequest' => $request]);
+
+        $usageDb->adjustAppUsage($proxiedApp['proxiedAppDetails']['id'], $request['code']);
+
+        echo $request['response'];
+        exit();
     } else {
         $isAllowedEndpoint  = $starr->isAllowedEndpoint($app, $proxiedApp['access'], $endpoint);
         $starrEndpoint      = $isAllowedEndpoint['starrEndpoint'];
