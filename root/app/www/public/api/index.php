@@ -267,6 +267,20 @@ if ($internalEndpoint) {
                 apiResponse(502, ['error' => sprintf(APP_API_ERROR, 'could not access the requested starr app, it appears to be down and returning an HTTP 0 code')]);
             }
 
+            //-- CHECK FOR FIELD REDACTIONS
+            if ($redactions = $proxiedApp['proxiedAppDetails']['redactions']) {
+                logger($logfile, ['req' => $requestCounter, 'endpoint' => $originalEndpoint, 'redactions' => $redactions]);
+                logger($proxiedAppLogfile, ['req' => $requestCounter, 'endpoint' => $originalEndpoint, 'redactions' => $redactions]);
+
+                $redactionList = explode(',', $redactions);
+                foreach ($request['response'] as $responseKey => $responseVal) {
+                    if (in_array($responseKey, $redactionList)) {
+                        logger($logfile, ['req' => $requestCounter, 'endpoint' => $originalEndpoint, 'redaction-match' => $responseKey]);
+                        $request['response'][$responseKey] = REDACTION_VALUE;
+                    }
+                }
+            }
+
             apiResponse($request['code'], $request['response'], $request['responseHeaders']);
         }
     }

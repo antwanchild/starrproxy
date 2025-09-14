@@ -54,3 +54,6 @@ define('APPS_TABLE_CACHE_KEY', 'apps_table');
 define('APPS_TABLE_CACHE_TIME', 86400); //-- 1 DAY
 define('STARR_ENDPOINT_LIST_KEY', 'endpoints_%s'); //-- _starrApp
 define('STARR_ENDPOINT_LIST_TIME', 604800); //-- 1 WEEK
+
+//-- MISC
+define('REDACTION_VALUE', '{PROXY-REDACTED}');

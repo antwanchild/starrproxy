@@ -26,6 +26,10 @@ if ($_POST['m'] == 'saveSettings') {
             continue;
         }
 
+        if ($key == 'redactionFields') {
+            $val = str_replace("\n", ',', $val);
+        }
+
         $newSettings[$key] = $val;
     }
 

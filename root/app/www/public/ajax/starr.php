@@ -90,8 +90,10 @@ if ($_POST['m'] == 'saveStarr') {
 if ($_POST['m'] == 'openAppStarrAccess') {
     $existing               = $proxyDb->getAppFromId($_POST['id'], $appsTable);
     $existing['endpoints']  = $existing['endpoints'] ? json_decode($existing['endpoints'], true) : [];
+    $existing['redactions'] = $existing['redactions'] ? array_filter(explode(',', $existing['redactions'])) : [];
     $clone                  = isset($_POST['clone']) ? $proxyDb->getAppFromId($_POST['clone'], $appsTable) : [];
     $endpoints              = $starr->getEndpoints($app);
+    $redactedOptions        = array_filter(explode(',', $settingsTable['redactionFields']));
     $appInstances           = '';
 
     if ($clone) {
@@ -132,6 +134,19 @@ if ($_POST['m'] == 'openAppStarrAccess') {
             <td><?= ucfirst($app) ?> instance<br><span class="text-small">Select which instance this app will access</span></td>
             <td>
                 <select class="form-select" id="access-instance"><option value="">-- Select instance --</option><?= $appInstances ?></select>
+            </td>
+        </tr>
+        <tr>
+            <td>Redactions<br><span class="text-small">Selected fields will have their value replaced with <code>{PROXY-REDACTED}</code> in the response</span></td>
+            <td>
+                <select class="form-select" multiple size="5" id="access-redactions">
+                <?php
+                foreach ($redactedOptions as $redactedOption) {
+                    $redactedOption = trim($redactedOption);
+                    ?><option <?= in_array($redactedOption, $existing['redactions']) ? 'selected ' : '' ?>value="<?= $redactedOption ?>"><?= $redactedOption ?></option><?php
+                }
+                ?>
+                </select>
             </td>
         </tr>
         <tr>
@@ -221,6 +236,7 @@ if ($_POST['m'] == 'saveAppStarrAccess') {
     $fields['starr_id']     = intval($_POST['starr_id']);
     $fields['endpoints']    = json_encode($endpoints, JSON_UNESCAPED_SLASHES);
     $fields['template']     = $_POST['template'];
+    $fields['redactions']   = $_POST['redactions'];
 
     if ($_POST['id'] != 99) {
         $error = $proxyDb->updateApp($_POST['id'], $fields);

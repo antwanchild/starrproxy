@@ -19,10 +19,15 @@ $migrations = '<option value="000">000_fresh_start</option>';
 $dir = opendir(MIGRATIONS_PATH);
 while ($migration = readdir($dir)) {
     if (str_contains($migration, '.php')) {
-        $migrations .= '<option ' . ($settingsTable['migration'] == substr($migration, 0, 3) ? 'selected ' : '') . 'value="' . substr($migration, 0, 3) . '">' . str_replace('.php', '', $migration) . '</option>';
+        $migrationFiles[] = $migration;
     }
 }
 closedir($dir);
+sort($migrationFiles);
+
+foreach ($migrationFiles as $migrationFile) {
+    $migrations .= '<option ' . ($settingsTable['migration'] == substr($migrationFile, 0, 3) ? 'selected ' : '') . 'value="' . substr($migrationFile, 0, 3) . '">' . str_replace('.php', '', $migrationFile) . '</option>';
+}
 
 $backups    = $proxyDb->getBackups();
 $cacheStats = $cache->stats();
@@ -36,7 +41,7 @@ $cacheStats = $cache->stats();
             <div class="card-header">System</div>
             <div class="card-body">
                 <div class="table-responsive">
-                    <table class="table table-bordered table-hover">
+                    <table class="table table-sm table-bordered table-hover">
                         <tbody>
                             <tr>
                                 <td class="w-25">
@@ -44,7 +49,7 @@ $cacheStats = $cache->stats();
                                     <span class="text-small">File: <?= APP_APIKEY_FILE ?></span>
                                 </td>
                                 <td>
-                                    <div class="input-group mb-3 w-25">
+                                    <div class="input-group mb-3 w-50">
                                         <input type="text" class="form-control" aria-describedby="apikey-input" value="<?= APP_APIKEY ?>" id="setting-apikey">
                                         <button title="Copy" class="btn btn-primary" type="button" id="apikey-input" onclick="clipboard('setting-apikey', 'val')"><i class="far fa-copy"></i></button>
                                     </div>
@@ -58,10 +63,13 @@ $cacheStats = $cache->stats();
     </div>
     <div class="col-sm-12">
         <div class="card border-default mb-3">
-            <div class="card-header">UI</div>
+            <div class="card-header">
+                UI
+                <br><span class="text-small">Adjust settings that impact the interface</span>
+            </div>
             <div class="card-body">
                 <div class="table-responsive">
-                    <table class="table table-bordered table-hover">
+                    <table class="table table-sm table-bordered table-hover">
                         <thead>
                             <tr>
                                 <th colspan="2">Navigation</th>
@@ -125,10 +133,33 @@ $cacheStats = $cache->stats();
     </div>
     <div class="col-sm-12">
         <div class="card border-default mb-3">
+            <div class="card-header">
+                Redactions
+                <br><span class="text-small">Remove specific fields from the starr responses</span>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-sm table-bordered table-hover">
+                        <tbody>
+                            <tr>
+                                <td class="w-25">
+                                    Fields<br>
+                                    <span class="text-small">One field per line</span>
+                                </td>
+                                <td><textarea class="form-control w-25" rows="10" id="setting-redactionFields"><?= implode("\n", explode(',', $settingsTable['redactionFields'])) ?></textarea></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-sm-12">
+        <div class="card border-default mb-3">
             <div class="card-header">Database</div>
             <div class="card-body">
                 <div class="table-responsive">
-                    <table class="table table-bordered table-hover">
+                    <table class="table table-sm table-bordered table-hover">
                         <tbody>
                             <tr>
                                 <td class="w-25">
@@ -180,7 +211,7 @@ $cacheStats = $cache->stats();
             <div class="card-header">Logging</div>
             <div class="card-body">
                 <div class="table-responsive">
-                    <table class="table table-bordered table-hover">
+                    <table class="table table-sm table-bordered table-hover">
                         <tbody>
                             <tr>
                                 <td class="w-25">
@@ -207,7 +238,7 @@ $cacheStats = $cache->stats();
             <div class="card-header">Cache</div>
             <div class="card-body">
                 <div class="table-responsive">
-                    <table class="table table-bordered table-hover">
+                    <table class="table table-sm table-bordered table-hover">
                         <tbody>
                             <tr>
                                 <td class="w-25">Memcache enabled</td>

@@ -132,13 +132,13 @@ if (!$_SESSION['IN_UI']) {
                                             <a class="nav-link" data-bs-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false"><i class="fas fa-ellipsis-h text-info"></i></a>
                                             <div class="dropdown-menu">
                                                 <div class="ms-2">
-                                                    <span style="cursor: pointer;" onclick="openAppStarrAccess('<?= $app ?>', <?= $accessApp['id'] ?>)" title="Modify the <?= $accessApp['name'] ?> app's details"><i class="far fa-edit"></i> Modify</span><br>
-                                                    <span style="cursor: pointer;" onclick="viewAppLog('<?= LOGS_PATH . 'access_'. $accessApp['name'] .'.log' ?>', '<?= truncateMiddle($accessApp['apikey'], 20) ?>', '<?= $accessApp['name'] ?>')" title="View <?= $accessApp['name'] ?> app logs"><i class="fas fa-newspaper"></i> Logs</span><br>
-                                                    <span style="cursor: pointer;" onclick="openAppStarrAccess('<?= $app ?>', 99, <?= $accessApp['id'] ?>)" title="Clone the <?= $accessApp['name'] ?> app"><i class="far fa-clone"></i> Clone</span><br>
-                                                    <span style="cursor: pointer;" onclick="openTemplateStarrAccess('<?= $app ?>', <?= $accessApp['id'] ?>)" title="Create a new template based on <?= $accessApp['name'] ?>'s settings"><i class="far fa-file-alt"></i> Create template</span><br>
+                                                    <span style="cursor: pointer;" onclick="openAppStarrAccess('<?= $app ?>', <?= $accessApp['id'] ?>)" title="Modify the <?= $accessApp['name'] ?> app's details"><i class="far fa-edit fa-fw"></i> Modify</span><br>
+                                                    <span style="cursor: pointer;" onclick="viewAppLog('<?= LOGS_PATH . 'access_'. $accessApp['name'] .'.log' ?>', '<?= truncateMiddle($accessApp['apikey'], 20) ?>', '<?= $accessApp['name'] ?>')" title="View <?= $accessApp['name'] ?> app logs"><i class="fas fa-newspaper fa-fw"></i> Logs</span><br>
+                                                    <span style="cursor: pointer;" onclick="openAppStarrAccess('<?= $app ?>', 99, <?= $accessApp['id'] ?>)" title="Clone the <?= $accessApp['name'] ?> app"><i class="far fa-clone fa-fw"></i> Clone</span><br>
+                                                    <span style="cursor: pointer;" onclick="openTemplateStarrAccess('<?= $app ?>', <?= $accessApp['id'] ?>)" title="Create a new template based on <?= $accessApp['name'] ?>'s settings"><i class="far fa-file-alt fa-fw"></i> Create template</span><br>
                                                     <div class="dropdown-divider"></div>
-                                                    <span style="cursor: pointer;" onclick="resetUsage('<?= $app ?>', <?= $accessApp['id'] ?>)" title="Reset usage counter"><i class="fas fa-recycle text-danger"></i> Reset usage</span><br>
-                                                    <span style="cursor: pointer;" onclick="deleteAppStarrAccess('<?= $app ?>', <?= $accessApp['id'] ?>)" title="Remove the <?= $accessApp['name'] ?> app's access"><i class="far fa-trash-alt text-danger"></i> Delete</span>
+                                                    <span style="cursor: pointer;" onclick="resetUsage('<?= $app ?>', <?= $accessApp['id'] ?>)" title="Reset usage counter"><i class="fas fa-recycle text-danger fa-fw"></i> Reset usage</span><br>
+                                                    <span style="cursor: pointer;" onclick="deleteAppStarrAccess('<?= $app ?>', <?= $accessApp['id'] ?>)" title="Remove the <?= $accessApp['name'] ?> app's access"><i class="far fa-trash-alt text-danger fa-fw"></i> Delete</span>
                                                 </div>
                                             </div>
                                         </li>
@@ -149,8 +149,9 @@ if (!$_SESSION['IN_UI']) {
                         <div class="card-body">
                             Instance: <?= $parentStarrApp['name'] ?> <span class="text-small"><?= $parentStarrApp['url'] ?></span><br>
                             Access: <?= count($accessApp['endpoints'], COUNT_RECURSIVE) ?> endpoint<?= count($accessApp['endpoints'], COUNT_RECURSIVE) == 1 ? '' : 's' ?><?= $template ?><br>
+                            Redactions: <?= count(array_filter(explode(',', $accessApp['redactions']))) ?> applied<br>
                             Apikey: <?= truncateMiddle($accessApp['apikey'], 20) ?> <i class="far fa-copy text-info" style="cursor: pointer;" onclick="clipboard('app-<?= $accessApp['id'] ?>-apikey', 'html')" title="Copy apikey to clipboard"></i><span id="app-<?= $accessApp['id'] ?>-apikey" style="display: none;"><?= $accessApp['apikey'] ?></span><br>
-                            Usage: <?= number_format($usage['allowed'] + $usage['rejected']) ?> request<?= $usage['allowed'] + $usage['rejected'] == 1 ? '' : 's' ?> (Allowed: <?= number_format($usage['allowed']) ?> Rejected: <?= number_format($usage['rejected']) ?>)
+                            Usage: <?= number_format($usage['allowed'] + $usage['rejected']) ?> request<?= $usage['allowed'] + $usage['rejected'] == 1 ? '' : 's' ?> (Pass: <?= number_format($usage['allowed']) ?> Fail: <?= number_format($usage['rejected']) ?>)
                         </div>
                     </div>
                 </div>
